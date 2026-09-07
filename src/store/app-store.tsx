@@ -315,7 +315,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
           const existing = s.runs.filter((r) => r.planId === planId).length;
           const newRuns: TestRun[] = caseIds.map((caseId, i) => {
             const tc = s.cases.find((c) => c.id === caseId)!;
-            const version = tc.versions[tc.versions.length - 1];
+            const version = tc.versions[tc.versions.length - 1]!;
             return {
               id: uid("run"),
               projectId: s.activeProjectId,
