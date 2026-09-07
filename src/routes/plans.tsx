@@ -245,16 +245,23 @@ function PlansPage() {
         <p className="text-[11.5px] text-muted-foreground">
           Each selected case is copied into the plan as a run, pinned to its current version.
         </p>
-        <div className="flex flex-wrap gap-1.5">
-          {store.scenarios.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => setPicked([...new Set([...picked, ...s.members.map((m) => m.testCaseId)])])}
-              className="rounded-md bg-card px-2 py-1 font-mono text-[10px] border border-border hover:bg-muted"
-            >
-              + {s.name}
-            </button>
-          ))}
+        <div>
+          <Caps className="mb-1.5">Pull a scenario · creates a folder in the plan</Caps>
+          <div className="flex flex-wrap gap-1.5">
+            {store.scenarios.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => {
+                  if (!active) return;
+                  store.addScenarioToPlan(active.id, s.id);
+                  setAssigning(false);
+                }}
+                className="rounded-md bg-card px-2 py-1 font-mono text-[10px] border border-border hover:bg-muted"
+              >
+                + {s.name} ({s.members.length})
+              </button>
+            ))}
+          </div>
         </div>
         <div className="max-h-[360px] space-y-1 overflow-y-auto">
           {store.cases.map((c) => {
