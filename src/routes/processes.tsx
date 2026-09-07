@@ -177,9 +177,11 @@ function ProcessesPage() {
                   <span className="font-mono text-[10px] text-muted-foreground">{wbs}</span>
                   <div className="flex min-w-0 items-center gap-1.5" style={{ paddingLeft: depth * 16 }}>
                     {kids.length ? (
-                      <Button variant="ghost" className="size-6 min-h-6 shrink-0 px-0" onClick={(event) => { event.stopPropagation(); setCollapsed((previous) => { const next = new Set(previous); next.has(node.id) ? next.delete(node.id) : next.add(node.id); return next; }); }} aria-label={collapsed.has(node.id) ? `Expand ${node.name}` : `Collapse ${node.name}`}>
-                        {collapsed.has(node.id) ? <ChevronRight className="size-3.5" /> : <ChevronDown className="size-3.5" />}
-                      </Button>
+                      <span onClick={(event) => event.stopPropagation()}>
+                        <Button variant="ghost" className="size-6 min-h-6 shrink-0 px-0" onClick={() => { setCollapsed((previous) => { const next = new Set(previous); next.has(node.id) ? next.delete(node.id) : next.add(node.id); return next; }); }} aria-label={collapsed.has(node.id) ? `Expand ${node.name}` : `Collapse ${node.name}`}>
+                          {collapsed.has(node.id) ? <ChevronRight className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+                        </Button>
+                      </span>
                     ) : <span className="w-6" />}
                     <span className="truncate font-medium">{node.name}</span>
                   </div>
