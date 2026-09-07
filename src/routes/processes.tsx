@@ -246,9 +246,11 @@ function ProcessesPage() {
                 </>
               )}
             </div>
-            <Button onClick={() => setCreating({ parentId: selected })}>
-              {selected ? "Add child node" : "Add root node"}
-            </Button>
+            {canEdit ? (
+              <Button onClick={() => setCreating({ parentId: selected })}>
+                {selected ? "Add child node" : "Add root node"}
+              </Button>
+            ) : null}
           </>
         }
       />

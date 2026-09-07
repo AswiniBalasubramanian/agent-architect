@@ -182,9 +182,11 @@ function TestCasesPage() {
                   <div className="font-display text-[15px] leading-tight font-semibold">{active.name}</div>
                   <p className="mt-1 text-[11.5px] text-muted-foreground">{active.description}</p>
                 </div>
-                <Button variant="ghost" onClick={startEdit}>
-                  Edit steps
-                </Button>
+                {canEdit ? (
+                  <Button variant="ghost" onClick={startEdit}>
+                    Edit steps
+                  </Button>
+                ) : null}
               </div>
 
               <div className="grid grid-cols-4 gap-3 border-b border-border px-4 py-3 text-[11px]">
