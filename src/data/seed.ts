@@ -250,10 +250,10 @@ const stepTemplate = (caseName: string, variant: number) => {
   return base.slice(0, 5 + (variant % 3)).map(([title, instruction, action, expected], i) => ({
     id: `${caseName}-s${i}`.replace(/\s+/g, "-").toLowerCase(),
     stepNo: i + 1,
-    title,
-    instruction,
-    action,
-    expected,
+    title: title!,
+    instruction: instruction!,
+    action: action!,
+    expected: expected!,
   }));
 };
 
