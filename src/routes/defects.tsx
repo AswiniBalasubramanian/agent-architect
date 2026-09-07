@@ -159,6 +159,7 @@ function DefectsPage() {
                 </div>
                 <Meter
                   className="mt-2"
+                  blocks={18}
                   segments={[
                     {
                       value: Math.min(100, sla.percentElapsed),
