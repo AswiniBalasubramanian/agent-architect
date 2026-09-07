@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as DefectsRouteImport } from './routes/defects'
+import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as PlansRouteImport } from './routes/plans'
 import { Route as ProcessesRouteImport } from './routes/processes'
+import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as RequirementsRouteImport } from './routes/requirements'
 import { Route as ScenariosRouteImport } from './routes/scenarios'
 import { Route as TestCasesRouteImport } from './routes/test-cases'
@@ -35,6 +37,11 @@ const DefectsRoute = DefectsRouteImport.update({
   path: '/defects',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InsightsRoute = InsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlansRoute = PlansRouteImport.update({
   id: '/plans',
   path: '/plans',
@@ -43,6 +50,11 @@ const PlansRoute = PlansRouteImport.update({
 const ProcessesRoute = ProcessesRouteImport.update({
   id: '/processes',
   path: '/processes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RequirementsRoute = RequirementsRouteImport.update({
@@ -75,8 +87,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/defects': typeof DefectsRoute
+  '/insights': typeof InsightsRoute
   '/plans': typeof PlansRoute
   '/processes': typeof ProcessesRoute
+  '/reports': typeof ReportsRoute
   '/requirements': typeof RequirementsRoute
   '/scenarios': typeof ScenariosRoute
   '/test-cases': typeof TestCasesRoute
@@ -87,8 +101,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/defects': typeof DefectsRoute
+  '/insights': typeof InsightsRoute
   '/plans': typeof PlansRoute
   '/processes': typeof ProcessesRoute
+  '/reports': typeof ReportsRoute
   '/requirements': typeof RequirementsRoute
   '/scenarios': typeof ScenariosRoute
   '/test-cases': typeof TestCasesRoute
@@ -100,8 +116,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/defects': typeof DefectsRoute
+  '/insights': typeof InsightsRoute
   '/plans': typeof PlansRoute
   '/processes': typeof ProcessesRoute
+  '/reports': typeof ReportsRoute
   '/requirements': typeof RequirementsRoute
   '/scenarios': typeof ScenariosRoute
   '/test-cases': typeof TestCasesRoute
@@ -114,8 +132,10 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/defects'
+    | '/insights'
     | '/plans'
     | '/processes'
+    | '/reports'
     | '/requirements'
     | '/scenarios'
     | '/test-cases'
@@ -126,8 +146,10 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/defects'
+    | '/insights'
     | '/plans'
     | '/processes'
+    | '/reports'
     | '/requirements'
     | '/scenarios'
     | '/test-cases'
@@ -138,8 +160,10 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/defects'
+    | '/insights'
     | '/plans'
     | '/processes'
+    | '/reports'
     | '/requirements'
     | '/scenarios'
     | '/test-cases'
@@ -151,8 +175,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   DefectsRoute: typeof DefectsRoute
+  InsightsRoute: typeof InsightsRoute
   PlansRoute: typeof PlansRoute
   ProcessesRoute: typeof ProcessesRoute
+  ReportsRoute: typeof ReportsRoute
   RequirementsRoute: typeof RequirementsRoute
   ScenariosRoute: typeof ScenariosRoute
   TestCasesRoute: typeof TestCasesRoute
@@ -183,6 +209,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DefectsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/insights': {
+      id: '/insights'
+      path: '/insights'
+      fullPath: '/insights'
+      preLoaderRoute: typeof InsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/plans': {
       id: '/plans'
       path: '/plans'
@@ -195,6 +228,13 @@ declare module '@tanstack/react-router' {
       path: '/processes'
       fullPath: '/processes'
       preLoaderRoute: typeof ProcessesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/requirements': {
@@ -239,8 +279,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   DefectsRoute: DefectsRoute,
+  InsightsRoute: InsightsRoute,
   PlansRoute: PlansRoute,
   ProcessesRoute: ProcessesRoute,
+  ReportsRoute: ReportsRoute,
   RequirementsRoute: RequirementsRoute,
   ScenariosRoute: ScenariosRoute,
   TestCasesRoute: TestCasesRoute,
