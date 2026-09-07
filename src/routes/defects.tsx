@@ -16,7 +16,11 @@ import {
   TextArea,
   TextInput,
 } from "@/components/ui-kit";
-import { useStore, userName, users, currentUser } from "@/store/app-store";
+import { NoAccess, TableSkeleton } from "@/components/ui-kit";
+import { AiAssist } from "@/components/ai-assist";
+import { triageDefect } from "@/lib/ai";
+import { organizations, projects, useStore, userName, users } from "@/store/app-store";
+import { useSimulatedLoad } from "@/hooks/use-simulated-load";
 import { ageInDays, formatDuration, slaState } from "@/lib/sla";
 import type { DefectStatus, Priority, Severity } from "@/data/types";
 import { cn } from "@/lib/utils";
@@ -41,7 +45,12 @@ function DefectsPage() {
   const now = new Date("2026-09-07T14:32:00Z").getTime();
   const [status, setStatus] = useState("All");
   const [severity, setSeverity] = useState("All");
-  const [selected, setSelected] = useState<string | null>(store.defects[0]?.id ?? null);
+  const [selected, setSelected] = useState<string | null>(null);
+  const ready = useSimulatedLoad(`${store.activeProjectId}:${store.personaId}`);
+  const project = projects.find((p) => p.id === store.activeProjectId)!;
+  const org = organizations.find((o) => o.id === project.orgId)!;
+  const canEdit = store.can("triageDefect") || store.can("administer");
+  const canRaise = store.can("raiseDefect");
   const [comment, setComment] = useState("");
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState({
@@ -56,13 +65,14 @@ function DefectsPage() {
   const rows = store.defects.filter(
     (d) => (status === "All" || d.status === status) && (severity === "All" || d.severity === severity),
   );
-  const active = store.defects.find((d) => d.id === selected);
+  const activeId = selected && rows.some((d) => d.id === selected) ? selected : (rows[0]?.id ?? null);
+  const active = store.defects.find((d) => d.id === activeId);
   const sla = active ? slaState(active, store.slaRules, now) : null;
   const breached = store.defects.filter((d) => slaState(d, store.slaRules, now).breached).length;
   const atRisk = store.defects.filter((d) => slaState(d, store.slaRules, now).atRisk).length;
 
   return (
-    <AppShell breadcrumbs={["Defects", "Nortaxis Systems", "S/4HANA Rollout — Wave 2"]}>
+    <AppShell breadcrumbs={[org.name, project.name, "Defects"]}>
       <PageHeader
         title="Defects & SLA"
         subtitle={`${store.defects.length} defects · ${breached} SLA breached · ${atRisk} at risk`}
@@ -78,11 +88,16 @@ function DefectsPage() {
                 <option key={s}>{s}</option>
               ))}
             </Select>
-            <Button onClick={() => setCreating(true)}>Log defect</Button>
+            {canRaise ? <Button onClick={() => setCreating(true)}>Log defect</Button> : null}
           </div>
         }
       />
 
+      {!ready ? (
+        <TableSkeleton rows={8} label="Loading defects" />
+      ) : rows.length === 0 ? (
+        <NoAccess what="No defects are in scope for this project and persona yet." />
+      ) : (
       <div className="grid grid-cols-12 gap-3">
         <Panel className="col-span-12 overflow-x-auto p-0 lg:col-span-7">
           <div className="grid grid-cols-[minmax(0,2fr)_70px_100px_minmax(0,1fr)_110px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
@@ -101,7 +116,7 @@ function DefectsPage() {
                   onClick={() => setSelected(d.id)}
                   className={cn(
                     "grid w-full grid-cols-[minmax(0,2fr)_70px_100px_minmax(0,1fr)_110px] items-center gap-2 px-4 py-2.5 text-left hover:bg-muted/70",
-                    selected === d.id && "bg-muted",
+                    activeId === d.id && "bg-muted",
                   )}
                 >
                   <div className="min-w-0">
@@ -173,6 +188,7 @@ function DefectsPage() {
                   <Caps>Status</Caps>
                   <Select
                     className="mt-1"
+                    disabled={!canEdit}
                     value={active.status}
                     onChange={(e) => store.updateDefect(active.id, { status: e.target.value as DefectStatus })}
                   >
@@ -185,6 +201,7 @@ function DefectsPage() {
                   <Caps>Severity</Caps>
                   <Select
                     className="mt-1"
+                    disabled={!canEdit}
                     value={active.severity}
                     onChange={(e) => store.updateDefect(active.id, { severity: e.target.value as Severity })}
                   >
@@ -197,6 +214,7 @@ function DefectsPage() {
                   <Caps>Assignee</Caps>
                   <Select
                     className="mt-1"
+                    disabled={!canEdit}
                     value={active.assignee}
                     onChange={(e) => store.updateDefect(active.id, { assignee: e.target.value })}
                   >
@@ -227,6 +245,39 @@ function DefectsPage() {
                 </div>
               </div>
 
+              {store.can("useAi") ? (
+                <div className="border-b border-border p-3">
+                  <AiAssist
+                    className="shadow-none"
+                    title="Triage assistant"
+                    hint="Suggests severity, likely area, a written summary and possible duplicates."
+                    cta="Triage"
+                    produce={() =>
+                      triageDefect({
+                        title: active.title,
+                        description: active.description,
+                        currentSeverity: active.severity,
+                        siblings: store.defects.filter((d) => d.id !== active.id).map((d) => ({ key: d.key, title: d.title })),
+                      })
+                    }
+                    acceptLabel="Apply severity"
+                    onAccept={(r) => canEdit && store.updateDefect(active.id, { severity: r.severity })}
+                    render={(r) => (
+                      <div className="space-y-1.5">
+                        <div>
+                          <b>Suggested severity:</b> {r.severity} · <b>Area:</b> {r.area}
+                        </div>
+                        <div>{r.summary}</div>
+                        <div className="text-muted-foreground">Next: {r.nextAction}</div>
+                        {r.duplicates.length ? (
+                          <div className="text-muted-foreground">Possible duplicates: {r.duplicates.join("; ")}</div>
+                        ) : null}
+                      </div>
+                    )}
+                  />
+                </div>
+              ) : null}
+
               <div className="px-4 py-3">
                 <Caps className="mb-2">Comments</Caps>
                 <div className="space-y-2 text-[12px]">
@@ -243,7 +294,7 @@ function DefectsPage() {
                   <TextInput
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    placeholder={`Comment as ${currentUser.name}`}
+                    placeholder={`Comment as ${store.me.name}`}
                   />
                   <Button
                     onClick={() => {
@@ -262,6 +313,7 @@ function DefectsPage() {
           )}
         </Panel>
       </div>
+      )}
 
       <Modal
         title="Log defect"

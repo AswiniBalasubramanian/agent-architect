@@ -13,7 +13,11 @@ import {
   TextArea,
   TextInput,
 } from "@/components/ui-kit";
-import { useStore, userName } from "@/store/app-store";
+import { organizations, projects, useStore, userName } from "@/store/app-store";
+import { CardsSkeleton, TableSkeleton } from "@/components/ui-kit";
+import { AiAssist } from "@/components/ai-assist";
+import { draftSteps } from "@/lib/ai";
+import { useSimulatedLoad } from "@/hooks/use-simulated-load";
 import type { Priority, TestStep } from "@/data/types";
 import { cn } from "@/lib/utils";
 
@@ -78,15 +82,30 @@ function TestCasesPage() {
     setEditing(true);
   };
 
+  const ready = useSimulatedLoad(`${store.activeProjectId}:${store.personaId}`);
+  const project = projects.find((p) => p.id === store.activeProjectId)!;
+  const org = organizations.find((o) => o.id === project.orgId)!;
+  const canEdit = store.can("authorMaster");
+
+  if (!ready) {
+    return (
+      <AppShell breadcrumbs={[org.name, project.name, "Test Case Repository"]}>
+        <PageHeader title="Test Case Repository" subtitle="Loading this workspace…" />
+        <CardsSkeleton />
+        <TableSkeleton rows={8} />
+      </AppShell>
+    );
+  }
+
   return (
-    <AppShell breadcrumbs={["Test Cases", "Nortaxis Systems", folder ? store.folders.find((f) => f.id === folder)!.name : "All folders"]}>
+    <AppShell breadcrumbs={[org.name, project.name, "Test Case Repository"]}>
       <PageHeader
         title="Test Case Repository"
         subtitle={`${store.cases.length} master cases · every save creates an immutable version · reusable across all projects`}
         actions={
           <>
             <TextInput value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search cases…" className="w-52" />
-            <Button onClick={() => setCreating(true)}>New test case</Button>
+            {canEdit ? <Button onClick={() => setCreating(true)}>New test case</Button> : null}
           </>
         }
       />
@@ -165,10 +184,48 @@ function TestCasesPage() {
                   <div className="font-display text-[15px] leading-tight font-semibold">{active.name}</div>
                   <p className="mt-1 text-[11.5px] text-muted-foreground">{active.description}</p>
                 </div>
-                <Button variant="ghost" onClick={startEdit}>
-                  Edit steps
-                </Button>
+                {canEdit ? (
+                  <Button variant="ghost" onClick={startEdit}>
+                    Edit steps
+                  </Button>
+                ) : null}
               </div>
+
+              {store.can("useAi") && canEdit ? (
+                <div className="border-b border-border p-3">
+                  <AiAssist
+                    className="shadow-none"
+                    title="Draft steps"
+                    hint="Writes an ordered step set for this case; review it, then save as a new version."
+                    cta="Draft steps"
+                    produce={() => draftSteps(active.name, active.application, active.testingType)}
+                    acceptLabel="Open in step editor"
+                    onAccept={(steps) => {
+                      setDraft(
+                        steps.map((st, i) => ({
+                          id: `ai-${i}-${st.title.toLowerCase().replace(/\W+/g, "-")}`,
+                          stepNo: i + 1,
+                          title: st.title,
+                          instruction: st.instruction,
+                          action: st.action,
+                          expected: st.expected,
+                        })),
+                      );
+                      setChangeNote("Steps drafted with the assistant");
+                      setEditing(true);
+                    }}
+                    render={(steps) => (
+                      <ol className="list-decimal space-y-1.5 pl-4">
+                        {steps.map((st) => (
+                          <li key={st.title}>
+                            <b>{st.title}</b> — {st.instruction} <span className="text-muted-foreground">Expected: {st.expected}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    )}
+                  />
+                </div>
+              ) : null}
 
               <div className="grid grid-cols-4 gap-3 border-b border-border px-4 py-3 text-[11px]">
                 <div>

@@ -37,6 +37,7 @@ export const users: AppUser[] = [
   { id: "u6", name: "Peter Aluko", initials: "PA", role: "Tester" },
   { id: "u7", name: "Hannah Voss", initials: "HV", role: "Admin" },
   { id: "u8", name: "Ravi Menon", initials: "RM", role: "Client Stakeholder" },
+  { id: "u9", name: "Elena Costa", initials: "EC", role: "Leadership" },
 ];
 
 export const currentUser: AppUser = users[0]!;

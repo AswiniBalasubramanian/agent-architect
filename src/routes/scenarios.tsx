@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button, Caps, Field, Modal, PageHeader, Panel, TextArea, TextInput } from "@/components/ui-kit";
-import { useStore, userName } from "@/store/app-store";
+import { organizations, projects, useStore, userName } from "@/store/app-store";
+import { CardsSkeleton, TableSkeleton } from "@/components/ui-kit";
+import { useSimulatedLoad } from "@/hooks/use-simulated-load";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/scenarios")({
@@ -46,12 +48,27 @@ function ScenariosPage() {
     store.setScenarioMembers(active.id, ids);
   };
 
+  const ready = useSimulatedLoad(`${store.activeProjectId}:${store.personaId}`);
+  const project = projects.find((p) => p.id === store.activeProjectId)!;
+  const org = organizations.find((o) => o.id === project.orgId)!;
+  const canEdit = store.can("authorMaster");
+
+  if (!ready) {
+    return (
+      <AppShell breadcrumbs={[org.name, project.name, "Test Scenarios"]}>
+        <PageHeader title="Test Scenarios" subtitle="Loading this workspace…" />
+        <CardsSkeleton />
+        <TableSkeleton rows={8} />
+      </AppShell>
+    );
+  }
+
   return (
-    <AppShell breadcrumbs={["Scenarios", "Nortaxis Systems", "Organization master"]}>
+    <AppShell breadcrumbs={[org.name, project.name, "Test Scenarios"]}>
       <PageHeader
         title="Test Scenarios"
         subtitle={`${store.scenarios.length} reusable end-to-end flows · pulled into plans as a bulk selection shortcut`}
-        actions={<Button onClick={() => setCreating(true)}>New scenario</Button>}
+        actions={canEdit ? <Button onClick={() => setCreating(true)}>New scenario</Button> : undefined}
       />
 
       <div className="grid grid-cols-12 gap-3">

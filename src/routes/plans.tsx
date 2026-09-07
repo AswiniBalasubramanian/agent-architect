@@ -15,7 +15,9 @@ import {
   TextArea,
   TextInput,
 } from "@/components/ui-kit";
-import { useStore, userName, users, runCounts } from "@/store/app-store";
+import { organizations, projects, useStore, userName, users, runCounts } from "@/store/app-store";
+import { CardsSkeleton, TableSkeleton } from "@/components/ui-kit";
+import { useSimulatedLoad } from "@/hooks/use-simulated-load";
 import type { TestPlan } from "@/data/types";
 import { cn } from "@/lib/utils";
 
@@ -77,12 +79,27 @@ function PlansPage() {
   const runs = active ? store.runs.filter((r) => r.planId === active.id) : [];
   const roll = runCounts(runs);
 
+  const ready = useSimulatedLoad(`${store.activeProjectId}:${store.personaId}`);
+  const project = projects.find((p) => p.id === store.activeProjectId)!;
+  const org = organizations.find((o) => o.id === project.orgId)!;
+  const canEdit = store.can("managePlans");
+
+  if (!ready) {
+    return (
+      <AppShell breadcrumbs={[org.name, project.name, "Test Plans"]}>
+        <PageHeader title="Test Plans" subtitle="Loading this workspace…" />
+        <CardsSkeleton />
+        <TableSkeleton rows={8} />
+      </AppShell>
+    );
+  }
+
   return (
-    <AppShell breadcrumbs={["Test Plans", "Nortaxis Systems", "S/4HANA Rollout — Wave 2"]}>
+    <AppShell breadcrumbs={[org.name, project.name, "Test Plans"]}>
       <PageHeader
         title="Test Plans"
         subtitle={`${store.plans.length} plans in this project · runs are created by adding test cases to a plan`}
-        actions={<Button onClick={() => setCreating(true)}>New test plan</Button>}
+        actions={canEdit ? <Button onClick={() => setCreating(true)}>New test plan</Button> : undefined}
       />
 
       <div className="grid grid-cols-12 gap-3">

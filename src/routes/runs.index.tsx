@@ -2,7 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button, Caps, PageHeader, Panel, PriorityTag, Select, StatusPill, TextInput } from "@/components/ui-kit";
-import { useStore, userName, users, runCounts } from "@/store/app-store";
+import { organizations, projects, useStore, userName, users, runCounts } from "@/store/app-store";
+import { CardsSkeleton, TableSkeleton } from "@/components/ui-kit";
+import { useSimulatedLoad } from "@/hooks/use-simulated-load";
 import type { RunStatus } from "@/data/types";
 import { cn } from "@/lib/utils";
 
@@ -40,8 +42,23 @@ function RunsPage() {
   });
   const counts = runCounts(store.runs);
 
+  const ready = useSimulatedLoad(`${store.activeProjectId}:${store.personaId}`);
+  const project = projects.find((p) => p.id === store.activeProjectId)!;
+  const org = organizations.find((o) => o.id === project.orgId)!;
+  const canEdit = store.can("execute");
+
+  if (!ready) {
+    return (
+      <AppShell breadcrumbs={[org.name, project.name, "Test Runs"]}>
+        <PageHeader title="Test Runs" subtitle="Loading this workspace…" />
+        <CardsSkeleton />
+        <TableSkeleton rows={8} />
+      </AppShell>
+    );
+  }
+
   return (
-    <AppShell breadcrumbs={["Test Runs", "Nortaxis Systems", "S/4HANA Rollout — Wave 2"]}>
+    <AppShell breadcrumbs={[org.name, project.name, "Test Runs"]}>
       <PageHeader
         title="Test Runs"
         subtitle={`${store.runs.length} runs · ${counts.Passed} passed · ${counts.Failed} failed · ${counts["Not Started"]} not started`}

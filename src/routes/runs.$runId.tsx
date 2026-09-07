@@ -38,6 +38,8 @@ function RunDetail() {
   const { runId } = useParams({ from: "/runs/$runId" });
   const store = useStore();
   const run = store.runs.find((r) => r.id === runId);
+  const canExecute = store.can("execute");
+  const canRaise = store.can("raiseDefect");
   const [defectOpen, setDefectOpen] = useState(false);
   const [defect, setDefect] = useState({
     title: "",
@@ -51,7 +53,7 @@ function RunDetail() {
     return (
       <AppShell breadcrumbs={["Test Runs", "Not found"]}>
         <Panel className="p-10 text-center text-[12px] text-muted-foreground">
-          This run no longer exists.{" "}
+          This run is not in scope for the current project or persona.{" "}
           <Link to="/runs" className="underline">
             Back to runs
           </Link>
@@ -72,10 +74,13 @@ function RunDetail() {
         subtitle={`${run.key} · ${testCase?.key} v${run.versionNo} · ${run.environment} · assigned to ${userName(run.assignee)}`}
         actions={
           <>
-            <Button variant="ghost" onClick={() => setDefectOpen(true)}>
-              Log defect
-            </Button>
+            {canRaise ? (
+              <Button variant="ghost" onClick={() => setDefectOpen(true)}>
+                Log defect
+              </Button>
+            ) : null}
             <Select
+              disabled={!canExecute}
               value={run.status}
               onChange={(e) => store.updateRun(run.id, { status: e.target.value as RunStatus })}
               className="w-36"
@@ -112,7 +117,8 @@ function RunDetail() {
                     </div>
                     <TextInput
                       className="mt-2"
-                      placeholder="Actual result / evidence note"
+                      disabled={!canExecute}
+                      placeholder={canExecute ? "Actual result / evidence note" : "Read-only for this persona"}
                       value={s.actual ?? ""}
                       onChange={(e) => store.setRunStepStatus(run.id, s.id, s.status, e.target.value)}
                     />
@@ -121,9 +127,10 @@ function RunDetail() {
                     {STEP_STATUSES.map((st) => (
                       <button
                         key={st}
+                        disabled={!canExecute}
                         onClick={() => store.setRunStepStatus(run.id, s.id, st, s.actual)}
                         className={cn(
-                          "rounded-md px-2 py-1 font-mono text-[10px] ring-1 transition-colors",
+                          "rounded-md px-2 py-1 font-mono text-[10px] ring-1 transition-colors disabled:opacity-40",
                           s.status === st
                             ? "bg-primary text-primary-foreground ring-transparent"
                             : "bg-card text-muted-foreground ring-line hover:bg-muted",

@@ -25,7 +25,21 @@ import {
   testScenarios as seedScenarios,
   users,
 } from "@/data/seed";
+import {
+  extraDefects,
+  extraPlanFolders,
+  extraPlans,
+  extraProcesses,
+  extraRequirements,
+  extraRuns,
+  extraScenarios,
+  extraTestCaseFolders,
+  extraTestCases,
+} from "@/data/seed-extra";
+import { integrations as seedIntegrations, type Integration } from "@/data/integrations";
+import { personaById, personaUser, type Capability, type PersonaId } from "@/data/personas";
 import type {
+  AppUser,
   BusinessProcess,
   ConfigValue,
   CustomField,
@@ -60,11 +74,24 @@ interface State {
   customFields: CustomField[];
   slaRules: SlaRule[];
   notificationRules: NotificationRule[];
+  integrations: Integration[];
   activeProjectId: ID;
+  personaId: PersonaId;
+  syncingIntegrationId: ID | null;
+}
+
+interface Derived {
+  /** Organisation of the active project — master content is scoped to it. */
+  activeOrgId: ID;
+  me: AppUser;
+  can: (capability: Capability) => boolean;
+  /** Everything, unscoped, for cross-project rollups. */
+  all: Pick<State, "plans" | "runs" | "defects" | "cases" | "requirements">;
 }
 
 interface Actions {
   setActiveProject: (id: ID) => void;
+  setPersona: (id: PersonaId) => void;
   addProcess: (input: Partial<BusinessProcess> & { name: string; parentId: ID | null }) => void;
   updateProcess: (id: ID, patch: Partial<BusinessProcess>) => void;
   deleteProcess: (id: ID) => void;
@@ -89,9 +116,11 @@ interface Actions {
   toggleCustomField: (id: ID) => void;
   toggleSlaRule: (id: ID) => void;
   toggleNotificationRule: (id: ID) => void;
+  toggleIntegration: (id: ID) => void;
+  syncIntegration: (id: ID) => Promise<void>;
 }
 
-const AppStoreContext = createContext<(State & Actions) | null>(null);
+const AppStoreContext = createContext<(State & Derived & Actions) | null>(null);
 
 const rollupStatus = (steps: { status: StepStatus }[]): RunStatus => {
   if (steps.some((s) => s.status === "Failed")) return "Failed";
@@ -103,20 +132,23 @@ const rollupStatus = (steps: { status: StepStatus }[]): RunStatus => {
 
 export function AppStoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<State>({
-    processes: seedProcesses,
-    requirements: seedRequirements,
-    folders: seedFolders,
-    cases: seedCases,
-    scenarios: seedScenarios,
-    plans: seedPlans,
-    planFolders: seedPlanFolders,
-    runs: seedRuns,
-    defects: seedDefects,
+    processes: [...seedProcesses, ...extraProcesses],
+    requirements: [...seedRequirements, ...extraRequirements],
+    folders: [...seedFolders, ...extraTestCaseFolders],
+    cases: [...seedCases, ...extraTestCases],
+    scenarios: [...seedScenarios, ...extraScenarios],
+    plans: [...seedPlans, ...extraPlans],
+    planFolders: [...seedPlanFolders, ...extraPlanFolders],
+    runs: [...seedRuns, ...extraRuns],
+    defects: [...seedDefects, ...extraDefects],
     config: seedConfig,
     customFields: seedCustomFields,
     slaRules: seedSlaRules,
     notificationRules: seedNotificationRules,
+    integrations: seedIntegrations,
     activeProjectId: "p1",
+    personaId: "manager",
+    syncingIntegrationId: null,
   });
 
   const patch = useCallback((fn: (s: State) => Partial<State>) => {
@@ -126,6 +158,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const actions = useMemo<Actions>(
     () => ({
       setActiveProject: (id) => patch(() => ({ activeProjectId: id })),
+      setPersona: (id) => patch(() => ({ personaId: id })),
 
       addProcess: (input) =>
         patch((s) => ({
@@ -133,16 +166,16 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
             ...s.processes,
             {
               id: uid("bp"),
-              orgId: "org1",
+              orgId: orgOf(s.activeProjectId),
               name: input.name,
               parentId: input.parentId,
               levelType: input.levelType ?? "Process Step",
               application: input.application ?? "SAP ERP",
               sourceType: input.sourceType ?? "Manual",
-              owner: input.owner ?? currentUser.id,
+              owner: input.owner ?? personaUser(s.personaId).id,
               description: input.description ?? "",
               tags: input.tags ?? [],
-              createdBy: currentUser.id,
+              createdBy: personaUser(s.personaId).id,
               createdOn: new Date().toISOString(),
             },
           ],
@@ -180,12 +213,12 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
           requirements: [
             {
               id: uid("req"),
-              orgId: "org1",
+              orgId: orgOf(s.activeProjectId),
               name: input.name,
               description: input.description ?? "",
               status: input.status ?? "Draft",
               priority: input.priority ?? "Medium",
-              owner: input.owner ?? currentUser.id,
+              owner: input.owner ?? personaUser(s.personaId).id,
               processIds: input.processIds ?? [],
               sourceType: input.sourceType ?? "Manual",
               tags: input.tags ?? [],
@@ -206,18 +239,19 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         patch((s) => {
           const key = `TC-${5000 + s.cases.length}`;
           const now = new Date().toISOString();
+          const author = personaUser(s.personaId).id;
           return {
             cases: [
               {
                 id: uid("tc"),
-                orgId: "org1",
+                orgId: orgOf(s.activeProjectId),
                 key,
                 name: input.name,
                 description: input.description,
                 folderId: input.folderId,
                 testingType: input.testingType,
                 priority: input.priority,
-                owner: currentUser.id,
+                owner: author,
                 application: "SAP ERP",
                 sourceType: "Manual",
                 requirementIds: [],
@@ -227,7 +261,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
                   {
                     id: `${key}-v1`,
                     version: 1,
-                    createdBy: currentUser.id,
+                    createdBy: author,
                     createdOn: now,
                     changeNote: "Initial authoring",
                     steps: [
@@ -259,7 +293,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
                 {
                   id: `${c.key}-v${next}`,
                   version: next,
-                  createdBy: currentUser.id,
+                  createdBy: personaUser(s.personaId).id,
                   createdOn: new Date().toISOString(),
                   changeNote: changeNote || "Content updated",
                   steps: steps.map((st, i) => ({ ...st, stepNo: i + 1 })),
@@ -277,11 +311,11 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
             ...s.scenarios,
             {
               id: uid("sc"),
-              orgId: "org1",
+              orgId: orgOf(s.activeProjectId),
               key: `SCN-${String(s.scenarios.length + 1).padStart(2, "0")}`,
               name: input.name,
               description: input.description,
-              owner: currentUser.id,
+              owner: personaUser(s.personaId).id,
               members: [],
             },
           ],
@@ -326,7 +360,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
               testCaseId: caseId,
               versionId: version.id,
               versionNo: version.version,
-              assignee: currentUser.id,
+              assignee: personaUser(s.personaId).id,
               status: "Not Started",
               priority: tc.priority,
               environment: plan?.defaultEnvironment ?? "dev-sap-04",
@@ -355,7 +389,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
               ...r,
               steps,
               status: rollup,
-              executedBy: currentUser.id,
+              executedBy: personaUser(s.personaId).id,
               executionStart: r.executionStart ?? new Date().toISOString(),
               executionEnd:
                 rollup === "Passed" || rollup === "Failed" ? new Date().toISOString() : undefined,
@@ -377,7 +411,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
               severity: input.severity,
               priority: input.priority,
               assignee: input.assignee,
-              reportedBy: currentUser.id,
+              reportedBy: personaUser(s.personaId).id,
               reportedOn: new Date().toISOString(),
               slaRuleId:
                 input.severity === "Critical"
@@ -417,7 +451,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
                   ...d,
                   comments: [
                     ...d.comments,
-                    { id: uid("c"), author: currentUser.id, on: new Date().toISOString(), body },
+                    { id: uid("c"), author: personaUser(s.personaId).id, on: new Date().toISOString(), body },
                   ],
                 }
               : d,
@@ -441,13 +475,84 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         patch((s) => ({
           notificationRules: s.notificationRules.map((c) => (c.id === id ? { ...c, active: !c.active } : c)),
         })),
+      toggleIntegration: (id) =>
+        patch((s) => ({
+          integrations: s.integrations.map((i) =>
+            i.id === id
+              ? {
+                  ...i,
+                  status: i.status === "Connected" ? "Not connected" : "Connected",
+                  lastSync: i.status === "Connected" ? undefined : new Date().toISOString(),
+                  recordCount: i.status === "Connected" ? undefined : (i.recordCount ?? 0),
+                }
+              : i,
+          ),
+        })),
+      syncIntegration: async (id) => {
+        patch(() => ({ syncingIntegrationId: id }));
+        await new Promise((r) => setTimeout(r, 1600));
+        patch((s) => ({
+          syncingIntegrationId: null,
+          integrations: s.integrations.map((i) =>
+            i.id === id
+              ? {
+                  ...i,
+                  status: "Connected",
+                  lastSync: new Date().toISOString(),
+                  recordCount: (i.recordCount ?? 0) + 17,
+                }
+              : i,
+          ),
+        }));
+      },
     }),
     [patch],
   );
 
-  const value = useMemo(() => ({ ...state, ...actions }), [state, actions]);
+  const value = useMemo(() => {
+    const activeOrgId = orgOf(state.activeProjectId);
+    const persona = personaById(state.personaId);
+    const me = personaUser(state.personaId);
+    const ownRunsOnly = persona.id === "tester" || persona.id === "client";
+
+    const plans = state.plans.filter((p) => p.projectId === state.activeProjectId);
+    const planIds = new Set(plans.map((p) => p.id));
+    const allProjectRuns = state.runs.filter((r) => r.projectId === state.activeProjectId);
+    const runs = ownRunsOnly ? allProjectRuns.filter((r) => r.assignee === me.id) : allProjectRuns;
+    const visibleRunIds = new Set(runs.map((r) => r.id));
+    const projectDefects = state.defects.filter((d) => d.projectId === state.activeProjectId);
+
+    return {
+      ...state,
+      ...actions,
+      activeOrgId,
+      me,
+      can: (capability: Capability) => persona.capabilities.includes(capability),
+      processes: state.processes.filter((p) => p.orgId === activeOrgId),
+      requirements: state.requirements.filter((r) => r.orgId === activeOrgId),
+      folders: state.folders.filter((f) => f.orgId === activeOrgId),
+      cases: state.cases.filter((c) => c.orgId === activeOrgId),
+      scenarios: state.scenarios.filter((sc) => sc.orgId === activeOrgId),
+      plans,
+      planFolders: state.planFolders.filter((f) => planIds.has(f.planId)),
+      runs,
+      defects: ownRunsOnly
+        ? projectDefects.filter((d) => (d.runId ? visibleRunIds.has(d.runId) : false) || d.reportedBy === me.id || d.assignee === me.id)
+        : projectDefects,
+      all: {
+        plans: state.plans,
+        runs: state.runs,
+        defects: state.defects,
+        cases: state.cases,
+        requirements: state.requirements,
+      },
+    };
+  }, [state, actions]);
+
   return <AppStoreContext.Provider value={value}>{children}</AppStoreContext.Provider>;
 }
+
+const orgOf = (projectId: ID) => projects.find((p) => p.id === projectId)?.orgId ?? "org1";
 
 export function useStore() {
   const ctx = useContext(AppStoreContext);
