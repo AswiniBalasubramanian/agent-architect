@@ -235,7 +235,7 @@ export function Select({
 
   return (
     <ShSelect
-      value={current === "" ? EMPTY : current}
+      value={current === undefined || current === "" ? EMPTY : current}
       disabled={!!disabled}
       onValueChange={(next) => {
         const resolved = next === EMPTY ? "" : next;
