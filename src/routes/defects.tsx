@@ -38,7 +38,7 @@ export const Route = createFileRoute("/defects")({
 
 function DefectsPage() {
   const store = useStore();
-  const now = Date.now();
+  const now = new Date("2026-09-07T14:32:00Z").getTime();
   const [status, setStatus] = useState("All");
   const [severity, setSeverity] = useState("All");
   const [selected, setSelected] = useState<string | null>(store.defects[0]?.id ?? null);

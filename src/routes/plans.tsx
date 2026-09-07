@@ -67,8 +67,8 @@ function PlansPage() {
     description: "",
     status: "Planned",
     owner: "u3",
-    startDate: new Date().toISOString().slice(0, 10),
-    endDate: new Date(Date.now() + 12096e5).toISOString().slice(0, 10),
+    startDate: "2026-09-07",
+    endDate: "2026-09-21",
     defaultEnvironment: "QA",
     testingType: "System Integration",
   });
