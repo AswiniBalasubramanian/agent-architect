@@ -107,8 +107,8 @@ function RunsPage() {
         ) : null}
       </Panel>
 
-      <Panel className="overflow-hidden p-0">
-        <div className="grid grid-cols-[32px_80px_minmax(0,2fr)_110px_90px_70px_minmax(0,1fr)_60px] gap-2 border-b border-line px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
+      <Panel className="overflow-x-auto p-0">
+        <div className="grid grid-cols-[32px_80px_minmax(0,2fr)_110px_90px_70px_minmax(0,1fr)_60px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
           <span />
           <span>RUN</span>
           <span>TEST CASE</span>
@@ -118,7 +118,7 @@ function RunsPage() {
           <span>ASSIGNEE</span>
           <span className="text-right">DEF</span>
         </div>
-        <div className="divide-y divide-line/70 text-[12px]">
+        <div className="divide-y divide-border text-[12px]">
           {rows.map((r) => {
             const c = store.cases.find((x) => x.id === r.testCaseId);
             const defects = store.defects.filter((d) => d.runId === r.id).length;
@@ -126,7 +126,7 @@ function RunsPage() {
               <div
                 key={r.id}
                 className={cn(
-                  "grid grid-cols-[32px_80px_minmax(0,2fr)_110px_90px_70px_minmax(0,1fr)_60px] items-center gap-2 px-4 py-2 hover:bg-white/70",
+                  "grid grid-cols-[32px_80px_minmax(0,2fr)_110px_90px_70px_minmax(0,1fr)_60px] items-center gap-2 px-4 py-2 hover:bg-muted/70",
                   checked.includes(r.id) && "bg-accent/5",
                 )}
               >
@@ -137,7 +137,7 @@ function RunsPage() {
                   onChange={(e) => setChecked(e.target.checked ? [...checked, r.id] : checked.filter((x) => x !== r.id))}
                   className="size-3.5 accent-[var(--accent)]"
                 />
-                <Link to="/runs/$runId" params={{ runId: r.id }} className="font-mono text-[10px] text-muted-foreground hover:text-ink">
+                <Link to="/runs/$runId" params={{ runId: r.id }} className="font-mono text-[10px] text-muted-foreground hover:text-foreground">
                   {r.key}
                 </Link>
                 <Link to="/runs/$runId" params={{ runId: r.id }} className="min-w-0">

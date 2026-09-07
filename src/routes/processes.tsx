@@ -86,14 +86,14 @@ function ProcessesPage() {
         subtitle={`${store.processes.length} nodes · organization-level master content · reusable across every project`}
         actions={
           <>
-            <div className="flex rounded-md bg-white/70 p-0.5 ring-1 ring-line">
+            <div className="flex rounded-md bg-card p-0.5 border border-border">
               {(["tree", "grid"] as const).map((v) => (
                 <button
                   key={v}
                   onClick={() => setView(v)}
                   className={cn(
                     "rounded px-2.5 py-1 font-mono text-[11px] capitalize",
-                    view === v ? "bg-ink text-paper" : "text-muted-foreground",
+                    view === v ? "bg-primary text-primary-foreground" : "text-muted-foreground",
                   )}
                 >
                   {v} view
@@ -107,8 +107,8 @@ function ProcessesPage() {
         }
       />
 
-      <Panel className="overflow-hidden p-0">
-        <div className="grid grid-cols-[80px_minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_120px_80px] gap-2 border-b border-line px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
+      <Panel className="overflow-x-auto p-0">
+        <div className="grid grid-cols-[80px_minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_120px_80px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
           <span>WBS</span>
           <span>NAME</span>
           <span>LEVEL TYPE</span>
@@ -117,7 +117,7 @@ function ProcessesPage() {
           <span>COVERAGE</span>
           <span className="text-right">SOURCE</span>
         </div>
-        <div className="divide-y divide-line/70 text-[12px]">
+        <div className="divide-y divide-border text-[12px]">
           {rows.map(({ node, depth, wbs }) => {
             const kids = childrenOf.get(node.id) ?? [];
             const cov = coverage(node.id);
@@ -126,8 +126,8 @@ function ProcessesPage() {
                 key={node.id}
                 onClick={() => setSelected(node.id === selected ? null : node.id)}
                 className={cn(
-                  "grid cursor-pointer grid-cols-[80px_minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_120px_80px] items-center gap-2 px-4 py-2 hover:bg-white/70",
-                  selected === node.id && "bg-white/80",
+                  "grid cursor-pointer grid-cols-[80px_minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_120px_80px] items-center gap-2 px-4 py-2 hover:bg-muted/70",
+                  selected === node.id && "bg-muted",
                 )}
               >
                 <span className="font-mono text-[10px] text-muted-foreground">{wbs}</span>

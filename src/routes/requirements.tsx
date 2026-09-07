@@ -76,7 +76,7 @@ function RequirementsPage() {
             onClick={() => setFilter(s)}
             className={cn(
               "rounded-md px-2.5 py-1 font-mono text-[11px]",
-              filter === s ? "bg-ink text-paper" : "bg-white/70 text-muted-foreground ring-1 ring-line",
+              filter === s ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground border border-border",
             )}
           >
             {s}
@@ -85,15 +85,15 @@ function RequirementsPage() {
       </div>
 
       <div className="grid grid-cols-12 gap-3">
-        <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-7">
-          <div className="grid grid-cols-[minmax(0,2fr)_100px_110px_minmax(0,1fr)_70px] gap-2 border-b border-line px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
+        <Panel className="col-span-12 overflow-x-auto p-0 lg:col-span-7">
+          <div className="grid grid-cols-[minmax(0,2fr)_100px_110px_minmax(0,1fr)_70px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
             <span>REQUIREMENT</span>
             <span>PRIORITY</span>
             <span>STATUS</span>
             <span>OWNER</span>
             <span className="text-right">CASES</span>
           </div>
-          <div className="divide-y divide-line/70 text-[12px]">
+          <div className="divide-y divide-border text-[12px]">
             {list.map((req) => {
               const cases = store.cases.filter((c) => c.requirementIds.includes(req.id)).length;
               return (
@@ -101,8 +101,8 @@ function RequirementsPage() {
                   key={req.id}
                   onClick={() => setSelected(req.id)}
                   className={cn(
-                    "grid w-full grid-cols-[minmax(0,2fr)_100px_110px_minmax(0,1fr)_70px] items-center gap-2 px-4 py-2.5 text-left hover:bg-white/70",
-                    selected === req.id && "bg-white/80",
+                    "grid w-full grid-cols-[minmax(0,2fr)_100px_110px_minmax(0,1fr)_70px] items-center gap-2 px-4 py-2.5 text-left hover:bg-muted/70",
+                    selected === req.id && "bg-muted",
                   )}
                 >
                   <div className="min-w-0">
@@ -114,7 +114,7 @@ function RequirementsPage() {
                   <PriorityTag priority={req.priority} />
                   <span className="font-mono text-[10px] text-muted-foreground">{req.status}</span>
                   <span className="truncate text-muted-foreground">{userName(req.owner)}</span>
-                  <span className={cn("text-right font-mono text-[11px]", cases ? "text-ink" : "text-fail")}>{cases}</span>
+                  <span className={cn("text-right font-mono text-[11px]", cases ? "text-foreground" : "text-fail")}>{cases}</span>
                 </button>
               );
             })}
@@ -124,12 +124,12 @@ function RequirementsPage() {
         <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-5">
           {active ? (
             <div>
-              <div className="border-b border-line px-4 py-3">
+              <div className="border-b border-border px-4 py-3">
                 <Caps>Requirement detail</Caps>
                 <div className="font-display text-[15px] leading-tight font-semibold">{active.name}</div>
                 <p className="mt-1.5 text-[12px] text-muted-foreground">{active.description}</p>
               </div>
-              <div className="grid grid-cols-3 gap-3 border-b border-line px-4 py-3 text-[11px]">
+              <div className="grid grid-cols-3 gap-3 border-b border-border px-4 py-3 text-[11px]">
                 <div>
                   <Caps>Status</Caps>
                   <Select
@@ -170,7 +170,7 @@ function RequirementsPage() {
                 </div>
               </div>
 
-              <div className="border-b border-line px-4 py-3">
+              <div className="border-b border-border px-4 py-3">
                 <Caps className="mb-2">Mapped processes</Caps>
                 <div className="flex flex-wrap gap-1.5">
                   {active.processIds.map((pid) => (
@@ -181,7 +181,7 @@ function RequirementsPage() {
                 </div>
               </div>
 
-              <div className="border-b border-line px-4 py-3">
+              <div className="border-b border-border px-4 py-3">
                 <Caps className="mb-2">Test preparation · {linkedCases.length} cases</Caps>
                 <div className="space-y-1.5 text-[12px]">
                   {linkedCases.map((c) => (

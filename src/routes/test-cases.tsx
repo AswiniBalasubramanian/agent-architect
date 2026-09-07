@@ -98,7 +98,7 @@ function TestCasesPage() {
             onClick={() => setFolder(null)}
             className={cn(
               "block w-full rounded-md px-2 py-1.5 text-left text-[12px]",
-              folder === null ? "bg-ink text-paper" : "text-muted-foreground hover:bg-white/70",
+              folder === null ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted/70",
             )}
           >
             All test cases
@@ -110,7 +110,7 @@ function TestCasesPage() {
               style={{ paddingLeft: f.parentId ? 22 : 8 }}
               className={cn(
                 "block w-full rounded-md py-1.5 pr-2 text-left text-[12px]",
-                folder === f.id ? "bg-ink text-paper" : "text-muted-foreground hover:bg-white/70",
+                folder === f.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted/70",
               )}
             >
               {f.name}
@@ -122,13 +122,13 @@ function TestCasesPage() {
         </Panel>
 
         <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-5">
-          <div className="grid grid-cols-[minmax(0,2fr)_90px_70px_60px] gap-2 border-b border-line px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
+          <div className="grid grid-cols-[minmax(0,2fr)_90px_70px_60px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
             <span>CASE</span>
             <span>TYPE</span>
             <span>PRIORITY</span>
             <span className="text-right">VER</span>
           </div>
-          <div className="max-h-[560px] divide-y divide-line/70 overflow-y-auto text-[12px]">
+          <div className="max-h-[560px] divide-y divide-border overflow-y-auto text-[12px]">
             {cases.map((c) => (
               <button
                 key={c.id}
@@ -138,8 +138,8 @@ function TestCasesPage() {
                   setEditing(false);
                 }}
                 className={cn(
-                  "grid w-full grid-cols-[minmax(0,2fr)_90px_70px_60px] items-center gap-2 px-4 py-2.5 text-left hover:bg-white/70",
-                  selected === c.id && "bg-white/80",
+                  "grid w-full grid-cols-[minmax(0,2fr)_90px_70px_60px] items-center gap-2 px-4 py-2.5 text-left hover:bg-muted/70",
+                  selected === c.id && "bg-muted",
                 )}
               >
                 <div className="min-w-0">
@@ -159,7 +159,7 @@ function TestCasesPage() {
         <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-5">
           {active && version ? (
             <div>
-              <div className="flex items-start justify-between gap-3 border-b border-line px-4 py-3">
+              <div className="flex items-start justify-between gap-3 border-b border-border px-4 py-3">
                 <div className="min-w-0">
                   <Caps>Case detail · {active.key}</Caps>
                   <div className="font-display text-[15px] leading-tight font-semibold">{active.name}</div>
@@ -170,7 +170,7 @@ function TestCasesPage() {
                 </Button>
               </div>
 
-              <div className="grid grid-cols-4 gap-3 border-b border-line px-4 py-3 text-[11px]">
+              <div className="grid grid-cols-4 gap-3 border-b border-border px-4 py-3 text-[11px]">
                 <div>
                   <Caps>Owner</Caps>
                   <div className="mt-0.5 font-semibold">{userName(active.owner)}</div>
@@ -190,16 +190,16 @@ function TestCasesPage() {
               </div>
 
               {!isLatest ? (
-                <div className="border-b border-line bg-warn/10 px-4 py-2 font-mono text-[11px] text-warn">
+                <div className="border-b border-border bg-warn/10 px-4 py-2 font-mono text-[11px] text-warn">
                   Viewing v{version.version} — this is not the latest version (v{active.versions.length}).
                 </div>
               ) : null}
 
-              <div className="border-b border-line px-4 py-3">
+              <div className="border-b border-border px-4 py-3">
                 <Caps className="mb-2">Steps · v{version.version}</Caps>
                 <ol className="space-y-2 text-[12px]">
                   {version.steps.map((s) => (
-                    <li key={s.id} className="rounded-md bg-white/60 p-2.5 ring-1 ring-line">
+                    <li key={s.id} className="rounded-md bg-card p-2.5 border border-border">
                       <div className="flex items-baseline gap-2">
                         <span className="font-mono text-[10px] text-muted-foreground">{s.stepNo}</span>
                         <span className="font-semibold">{s.title}</span>
@@ -284,7 +284,7 @@ function TestCasesPage() {
         </p>
         <div className="max-h-[380px] space-y-2 overflow-y-auto pr-1">
           {draft.map((s, i) => (
-            <div key={s.id} className="rounded-md bg-white/70 p-2.5 ring-1 ring-line">
+            <div key={s.id} className="rounded-md bg-card p-2.5 border border-border">
               <div className="flex items-center gap-2">
                 <span className="font-mono text-[10px] text-muted-foreground">{i + 1}</span>
                 <TextInput
