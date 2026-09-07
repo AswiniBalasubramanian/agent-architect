@@ -45,6 +45,8 @@ function TestCasesPage() {
   const [selected, setSelected] = useState<string | null>(store.cases[0]?.id ?? null);
   const [viewVersion, setViewVersion] = useState<number | null>(null);
   const [creating, setCreating] = useState(false);
+  const [checked, setChecked] = useState<string[]>([]);
+  const [moveTo, setMoveTo] = useState("f2");
   const [importing, setImporting] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<TestStep[]>([]);
@@ -134,6 +136,19 @@ function TestCasesPage() {
             <button
               key={f.id}
               onClick={() => setFolder(f.id)}
+              onDragOver={(e) => {
+                if (canEdit) e.preventDefault();
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (!canEdit) return;
+                const dropped = e.dataTransfer.getData("text/plain");
+                const ids = checked.length && dropped && checked.includes(dropped) ? checked : dropped ? [dropped] : [];
+                if (ids.length) {
+                  store.moveCasesToFolder(ids, f.id);
+                  setChecked([]);
+                }
+              }}
               style={{ paddingLeft: f.parentId ? 22 : 8 }}
               className={cn(
                 "block w-full rounded-md py-1.5 pr-2 text-left text-[12px]",
@@ -149,7 +164,32 @@ function TestCasesPage() {
         </Panel>
 
         <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-5">
-          <div className="grid grid-cols-[minmax(0,2fr)_90px_70px_60px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
+          {canEdit && checked.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-2 border-b border-border bg-muted/60 px-4 py-2 text-[11.5px]">
+              <span className="font-mono text-[10px] text-muted-foreground">{checked.length} selected</span>
+              <Select value={moveTo} onChange={(e) => setMoveTo(e.target.value)} className="w-40">
+                {store.folders.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.name}
+                  </option>
+                ))}
+              </Select>
+              <Button
+                onClick={() => {
+                  store.moveCasesToFolder(checked, moveTo);
+                  setChecked([]);
+                }}
+              >
+                Move to folder
+              </Button>
+              <Button variant="ghost" onClick={() => setChecked([])}>
+                Clear
+              </Button>
+              <span className="ml-auto font-mono text-[10px] text-muted-foreground">or drag onto a folder</span>
+            </div>
+          ) : null}
+          <div className="grid grid-cols-[22px_minmax(0,2fr)_90px_70px_60px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
+            <span />
             <span>CASE</span>
             <span>TYPE</span>
             <span>PRIORITY</span>
@@ -157,18 +197,31 @@ function TestCasesPage() {
           </div>
           <div className="max-h-[560px] divide-y divide-border overflow-y-auto text-[12px]">
             {cases.map((c) => (
-              <button
+              <div
                 key={c.id}
+                draggable={canEdit}
+                onDragStart={(e) => e.dataTransfer.setData("text/plain", c.id)}
                 onClick={() => {
                   setSelected(c.id);
                   setViewVersion(null);
                   setEditing(false);
                 }}
                 className={cn(
-                  "grid w-full grid-cols-[minmax(0,2fr)_90px_70px_60px] items-center gap-2 px-4 py-2.5 text-left hover:bg-muted/70",
+                  "grid w-full cursor-pointer grid-cols-[22px_minmax(0,2fr)_90px_70px_60px] items-center gap-2 px-4 py-2.5 text-left hover:bg-muted/70",
                   selected === c.id && "bg-muted",
                 )}
               >
+                <input
+                  type="checkbox"
+                  aria-label={`Select ${c.name}`}
+                  disabled={!canEdit}
+                  checked={checked.includes(c.id)}
+                  onClick={(e) => e.stopPropagation()}
+                  onChange={(e) =>
+                    setChecked(e.target.checked ? [...checked, c.id] : checked.filter((x) => x !== c.id))
+                  }
+                  className="size-3.5 accent-primary"
+                />
                 <div className="min-w-0">
                   <div className="truncate font-medium">{c.name}</div>
                   <div className="truncate font-mono text-[10px] text-muted-foreground">
@@ -178,10 +231,11 @@ function TestCasesPage() {
                 <span className="truncate font-mono text-[10px] text-muted-foreground">{c.testingType}</span>
                 <PriorityTag priority={c.priority} />
                 <span className="text-right font-mono text-[10px] text-muted-foreground">v{c.versions.length}</span>
-              </button>
+              </div>
             ))}
           </div>
         </Panel>
+
 
         <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-5">
           {active && version ? (
@@ -193,9 +247,14 @@ function TestCasesPage() {
                   <p className="mt-1 text-[11.5px] text-muted-foreground">{active.description}</p>
                 </div>
                 {canEdit ? (
-                  <Button variant="ghost" onClick={startEdit}>
-                    Edit steps
-                  </Button>
+                  <div className="flex shrink-0 gap-1.5">
+                    <Button variant="ghost" onClick={() => store.cloneTestCase(active.id)}>
+                      Clone
+                    </Button>
+                    <Button variant="ghost" onClick={startEdit}>
+                      Edit steps
+                    </Button>
+                  </div>
                 ) : null}
               </div>
 

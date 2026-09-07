@@ -101,6 +101,9 @@ interface Actions {
   addTestCase: (input: { name: string; folderId: ID; testingType: string; priority: TestCase["priority"]; description: string }) => void;
   saveTestCaseVersion: (id: ID, steps: TestCase["versions"][number]["steps"], changeNote: string) => void;
   updateTestCase: (id: ID, patch: Partial<TestCase>) => void;
+  cloneTestCase: (id: ID) => void;
+  moveCasesToFolder: (ids: ID[], folderId: ID) => void;
+  addScenarioToPlan: (planId: ID, scenarioId: ID) => void;
   addScenario: (input: { name: string; description: string }) => void;
   setScenarioMembers: (id: ID, memberIds: ID[]) => void;
   addPlan: (input: Omit<TestPlan, "id" | "key" | "projectId">) => void;
@@ -304,6 +307,43 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         })),
       updateTestCase: (id, p) =>
         patch((s) => ({ cases: s.cases.map((c) => (c.id === id ? { ...c, ...p } : c)) })),
+      cloneTestCase: (id) =>
+        patch((s) => {
+          const src = s.cases.find((c) => c.id === id);
+          if (!src) return {};
+          const key = `TC-${5000 + s.cases.length}`;
+          const now = new Date().toISOString();
+          const author = personaUser(s.personaId).id;
+          const latest = src.versions[src.versions.length - 1]!;
+          return {
+            cases: [
+              {
+                ...src,
+                id: uid("tc"),
+                key,
+                name: `${src.name} (copy)`,
+                owner: author,
+                sourceType: "Library",
+                createdOn: now,
+                versions: [
+                  {
+                    id: `${key}-v1`,
+                    version: 1,
+                    createdBy: author,
+                    createdOn: now,
+                    changeNote: `Cloned from ${src.key} v${latest.version}`,
+                    steps: latest.steps.map((st) => ({ ...st, id: uid("st") })),
+                  },
+                ],
+              },
+              ...s.cases,
+            ],
+          };
+        }),
+      moveCasesToFolder: (ids, folderId) =>
+        patch((s) => ({
+          cases: s.cases.map((c) => (ids.includes(c.id) ? { ...c, folderId } : c)),
+        })),
 
       addScenario: (input) =>
         patch((s) => ({
@@ -375,6 +415,48 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
             };
           });
           return { runs: [...s.runs, ...newRuns] };
+        }),
+      addScenarioToPlan: (planId, scenarioId) =>
+        patch((s) => {
+          const scenario = s.scenarios.find((sc) => sc.id === scenarioId);
+          const plan = s.plans.find((p) => p.id === planId);
+          if (!scenario) return {};
+          const folder: TestPlanFolder = {
+            id: uid("pf"),
+            planId,
+            name: scenario.name,
+            parentId: null,
+          };
+          const existing = s.runs.filter((r) => r.planId === planId).length;
+          const ordered = [...scenario.members].sort((a, b) => a.sequence - b.sequence);
+          const newRuns: TestRun[] = ordered.map((m, i) => {
+            const tc = s.cases.find((c) => c.id === m.testCaseId)!;
+            const version = tc.versions[tc.versions.length - 1]!;
+            return {
+              id: uid("run"),
+              projectId: s.activeProjectId,
+              planId,
+              folderId: folder.id,
+              key: `RUN-${2500 + s.runs.length + i}`,
+              sequence: existing + i + 1,
+              testCaseId: tc.id,
+              versionId: version.id,
+              versionNo: version.version,
+              assignee: personaUser(s.personaId).id,
+              status: "Not Started",
+              priority: tc.priority,
+              environment: plan?.defaultEnvironment ?? "dev-sap-04",
+              steps: version.steps.map((st) => ({
+                id: uid("rs"),
+                stepNo: st.stepNo,
+                title: st.title,
+                instruction: st.instruction,
+                expected: st.expected,
+                status: "Not Started" as StepStatus,
+              })),
+            };
+          });
+          return { planFolders: [...s.planFolders, folder], runs: [...s.runs, ...newRuns] };
         }),
       updateRun: (id, p) => patch((s) => ({ runs: s.runs.map((r) => (r.id === id ? { ...r, ...p } : r)) })),
       setRunStepStatus: (runId, stepId, status, actual) =>
