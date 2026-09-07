@@ -53,7 +53,7 @@ const statusColor: Record<RunStatus, string> = {
   "Not Started": "var(--pending)",
 };
 
-function Kpi({ label, value, hint, tone }: { label: string; value: string; hint: string; tone?: string }) {
+function Kpi({ label, value, hint, tone }: { label: string; value: string; hint: string; tone?: string | undefined }) {
   return (
     <Panel className="flex flex-col gap-1 p-4">
       <Caps>{label}</Caps>
