@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button, Caps, PageHeader, Panel, Select, TextInput } from "@/components/ui-kit";
-import { useStore, userName } from "@/store/app-store";
+import { useStore, userName, users } from "@/store/app-store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin")({
@@ -173,7 +173,7 @@ function AdminPage() {
                 <div>
                   <div className="font-medium">{n.name}</div>
                   <div className="font-mono text-[10px] text-muted-foreground">
-                    {n.event} → {n.recipients.join(", ")} · {n.channel}
+                    {n.event} → {n.recipients} · {n.channel}
                   </div>
                 </div>
                 <button
@@ -200,7 +200,7 @@ function AdminPage() {
             <span className="text-right">RUNS</span>
           </div>
           <div className="divide-y divide-line/70 text-[12px]">
-            {store.users.map((u) => (
+            {users.map((u) => (
               <div key={u.id} className="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1.5fr)_130px_100px] items-center gap-2 px-4 py-2.5">
                 <span className="font-medium">{userName(u.id)}</span>
                 <span className="truncate font-mono text-[10px] text-muted-foreground">{u.email}</span>
