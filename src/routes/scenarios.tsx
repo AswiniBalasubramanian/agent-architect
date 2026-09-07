@@ -40,7 +40,9 @@ function ScenariosPage() {
     const ids = members.map((m) => m.testCaseId);
     const target = index + delta;
     if (target < 0 || target >= ids.length) return;
-    [ids[index], ids[target]] = [ids[target], ids[index]];
+    const a = ids[index]!;
+    ids[index] = ids[target]!;
+    ids[target] = a;
     store.setScenarioMembers(active.id, ids);
   };
 

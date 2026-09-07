@@ -73,7 +73,7 @@ function TestCasesPage() {
 
   const startEdit = () => {
     if (!active) return;
-    setDraft(active.versions[active.versions.length - 1].steps.map((s) => ({ ...s })));
+    setDraft(active.versions[active.versions.length - 1]!.steps.map((s) => ({ ...s })));
     setChangeNote("");
     setEditing(true);
   };

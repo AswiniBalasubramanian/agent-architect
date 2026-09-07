@@ -38,7 +38,7 @@ export const users: AppUser[] = [
   { id: "u8", name: "Ravi Menon", initials: "RM", role: "Client Stakeholder" },
 ];
 
-export const currentUser = users[0];
+export const currentUser: AppUser = users[0]!;
 
 export const organizations: Organization[] = [
   { id: "org1", name: "Nortaxis Systems", industry: "Industrial Manufacturing" },
@@ -153,11 +153,11 @@ export const businessProcesses: BusinessProcess[] = (() => {
         orgId: "org1",
         name: node.name,
         parentId,
-        levelType: levelTypes[Math.min(depth, 4)],
-        application: applications[n % applications.length],
+        levelType: levelTypes[Math.min(depth, 4)]!,
+        application: applications[n % applications.length]!,
         sourceType: n % 5 === 0 ? "Integration" : n % 7 === 0 ? "Agent" : "Manual",
         integrationSource: n % 5 === 0 ? "SAP Cloud ALM" : undefined,
-        owner: users[n % users.length].id,
+        owner: users[n % users.length]!.id,
         description: `${node.name} — mapped during Explore workshops.`,
         tags: depth === 0 ? ["core"] : depth >= 3 ? ["executable"] : [],
         createdBy: "u2",
@@ -198,8 +198,8 @@ export const requirements: Requirement[] = reqSeeds.map(([name, description, sta
   description,
   status,
   priority,
-  owner: users[(i + 1) % users.length].id,
-  processIds: [leafProcesses[i % leafProcesses.length].id, leafProcesses[(i + 3) % leafProcesses.length].id],
+  owner: users[(i + 1) % users.length]!.id,
+  processIds: [leafProcesses[i % leafProcesses.length]!.id, leafProcesses[(i + 3) % leafProcesses.length]!.id],
   sourceType: i % 4 === 0 ? "Document" : i % 5 === 0 ? "Agent" : "Manual",
   tags: i % 3 === 0 ? ["fit-gap"] : ["standard"],
   createdOn: iso(50 - i),
@@ -250,10 +250,10 @@ const stepTemplate = (caseName: string, variant: number) => {
   return base.slice(0, 5 + (variant % 3)).map(([title, instruction, action, expected], i) => ({
     id: `${caseName}-s${i}`.replace(/\s+/g, "-").toLowerCase(),
     stepNo: i + 1,
-    title,
-    instruction,
-    action,
-    expected,
+    title: title!,
+    instruction: instruction!,
+    action: action!,
+    expected: expected!,
   }));
 };
 
@@ -263,7 +263,7 @@ export const testCases: TestCase[] = caseSeeds.map(([name, folderId, testingType
   const versions = Array.from({ length: versionCount }, (_, v) => ({
     id: `${key}-v${v + 1}`,
     version: v + 1,
-    createdBy: users[(i + v) % users.length].id,
+    createdBy: users[(i + v) % users.length]!.id,
     createdOn: iso(45 - i - v * 6),
     changeNote:
       v === 0
@@ -282,11 +282,11 @@ export const testCases: TestCase[] = caseSeeds.map(([name, folderId, testingType
     folderId,
     testingType,
     priority,
-    owner: users[i % users.length].id,
+    owner: users[i % users.length]!.id,
     application,
     sourceType: i % 5 === 0 ? "Library" : i % 4 === 0 ? "Agent" : "Manual",
-    requirementIds: [requirements[i % requirements.length].id, requirements[(i + 5) % requirements.length].id],
-    processIds: [leafProcesses[i % leafProcesses.length].id],
+    requirementIds: [requirements[i % requirements.length]!.id, requirements[(i + 5) % requirements.length]!.id],
+    processIds: [leafProcesses[i % leafProcesses.length]!.id],
     tags: i % 2 === 0 ? ["core", "regression"] : ["core"],
     versions,
     createdOn: iso(45 - i),
@@ -441,26 +441,26 @@ export const testRuns: TestRun[] = (() => {
   let n = 0;
   Object.entries(planScope).forEach(([planId, scope]) => {
     scope.cases.forEach((caseIdx, i) => {
-      const tc = testCases[caseIdx];
-      const latest = tc.versions[tc.versions.length - 1];
-      const version = planId === "pl3" ? tc.versions[0] : latest;
-      const status: RunStatus = planId === "pl3" ? (i % 4 === 2 ? "Failed" : "Passed") : statusCycle[(n + i) % statusCycle.length];
+      const tc = testCases[caseIdx]!;
+      const latest = tc.versions[tc.versions.length - 1]!;
+      const version = planId === "pl3" ? tc.versions[0]! : latest;
+      const status: RunStatus = planId === "pl3" ? (i % 4 === 2 ? "Failed" : "Passed") : statusCycle[(n + i) % statusCycle.length]!;
       n += 1;
       out.push({
         id: `run${n}`,
         projectId: "p1",
         planId,
-        folderId: scope.folders[i % scope.folders.length],
+        folderId: scope.folders[i % scope.folders.length] ?? null,
         key: `RUN-${2400 + n}`,
         sequence: i + 1,
         testCaseId: tc.id,
         versionId: version.id,
         versionNo: version.version,
-        assignee: users[(n + 2) % users.length].id,
+        assignee: users[(n + 2) % users.length]!.id,
         status,
         priority: tc.priority,
-        environment: planId === "pl2" ? "uat-sap-01" : envs[n % envs.length],
-        executedBy: status === "Not Started" ? undefined : users[(n + 2) % users.length].id,
+        environment: planId === "pl2" ? "uat-sap-01" : envs[n % envs.length]!,
+        executedBy: status === "Not Started" ? undefined : users[(n + 2) % users.length]!.id,
         executionStart: status === "Not Started" ? undefined : iso(6 - (n % 5), 8),
         executionEnd: status === "Passed" || status === "Failed" ? iso(6 - (n % 5), 11) : undefined,
         steps: runStepsFor(version.steps, status),
@@ -501,16 +501,16 @@ export const defects: Defect[] = defectSeeds.map(([title, description, severity,
     status: status as Defect["status"],
     severity,
     priority,
-    assignee: users[(i + 3) % users.length].id,
-    reportedBy: users[(i + 1) % users.length].id,
+    assignee: users[(i + 3) % users.length]!.id,
+    reportedBy: users[(i + 1) % users.length]!.id,
     reportedOn,
     slaRuleId,
     respondedOn: i % 3 === 0 ? undefined : iso(i < 3 ? 3 : i < 6 ? 6 : 12, 9 + (i % 4)),
     resolvedOn: status === "Resolved" || status === "Closed" ? iso(2, 15) : undefined,
     comments: [
-      { id: `c-${i}-1`, author: users[(i + 1) % users.length].id, on: reportedOn, body: "Raised from failed execution; screenshots attached in the run evidence." },
+      { id: `c-${i}-1`, author: users[(i + 1) % users.length]!.id, on: reportedOn, body: "Raised from failed execution; screenshots attached in the run evidence." },
       ...(i % 2 === 0
-        ? [{ id: `c-${i}-2`, author: users[(i + 3) % users.length].id, on: iso(2, 12), body: "Reproduced in the QA client. Configuration change drafted for review." }]
+        ? [{ id: `c-${i}-2`, author: users[(i + 3) % users.length]!.id, on: iso(2, 12), body: "Reproduced in the QA client. Configuration change drafted for review." }]
         : []),
     ],
   };

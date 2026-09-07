@@ -10,16 +10,29 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as DefectsRouteImport } from './routes/defects'
 import { Route as PlansRouteImport } from './routes/plans'
 import { Route as ProcessesRouteImport } from './routes/processes'
 import { Route as RequirementsRouteImport } from './routes/requirements'
 import { Route as ScenariosRouteImport } from './routes/scenarios'
 import { Route as TestCasesRouteImport } from './routes/test-cases'
 import { Route as RunsIndexRouteImport } from './routes/runs.index'
+import { Route as RunsRunIdRouteImport } from './routes/runs.$runId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DefectsRoute = DefectsRouteImport.update({
+  id: '/defects',
+  path: '/defects',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlansRoute = PlansRouteImport.update({
@@ -52,72 +65,98 @@ const RunsIndexRoute = RunsIndexRouteImport.update({
   path: '/runs/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RunsRunIdRoute = RunsRunIdRouteImport.update({
+  id: '/runs/$runId',
+  path: '/runs/$runId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/defects': typeof DefectsRoute
   '/plans': typeof PlansRoute
   '/processes': typeof ProcessesRoute
   '/requirements': typeof RequirementsRoute
   '/scenarios': typeof ScenariosRoute
   '/test-cases': typeof TestCasesRoute
+  '/runs/$runId': typeof RunsRunIdRoute
   '/runs/': typeof RunsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/defects': typeof DefectsRoute
   '/plans': typeof PlansRoute
   '/processes': typeof ProcessesRoute
   '/requirements': typeof RequirementsRoute
   '/scenarios': typeof ScenariosRoute
   '/test-cases': typeof TestCasesRoute
+  '/runs/$runId': typeof RunsRunIdRoute
   '/runs': typeof RunsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/defects': typeof DefectsRoute
   '/plans': typeof PlansRoute
   '/processes': typeof ProcessesRoute
   '/requirements': typeof RequirementsRoute
   '/scenarios': typeof ScenariosRoute
   '/test-cases': typeof TestCasesRoute
+  '/runs/$runId': typeof RunsRunIdRoute
   '/runs/': typeof RunsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
+    | '/defects'
     | '/plans'
     | '/processes'
     | '/requirements'
     | '/scenarios'
     | '/test-cases'
+    | '/runs/$runId'
     | '/runs/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
+    | '/defects'
     | '/plans'
     | '/processes'
     | '/requirements'
     | '/scenarios'
     | '/test-cases'
+    | '/runs/$runId'
     | '/runs'
   id:
     | '__root__'
     | '/'
+    | '/admin'
+    | '/defects'
     | '/plans'
     | '/processes'
     | '/requirements'
     | '/scenarios'
     | '/test-cases'
+    | '/runs/$runId'
     | '/runs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  DefectsRoute: typeof DefectsRoute
   PlansRoute: typeof PlansRoute
   ProcessesRoute: typeof ProcessesRoute
   RequirementsRoute: typeof RequirementsRoute
   ScenariosRoute: typeof ScenariosRoute
   TestCasesRoute: typeof TestCasesRoute
+  RunsRunIdRoute: typeof RunsRunIdRoute
   RunsIndexRoute: typeof RunsIndexRoute
 }
 
@@ -128,6 +167,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/defects': {
+      id: '/defects'
+      path: '/defects'
+      fullPath: '/defects'
+      preLoaderRoute: typeof DefectsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/plans': {
@@ -172,16 +225,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RunsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/runs/$runId': {
+      id: '/runs/$runId'
+      path: '/runs/$runId'
+      fullPath: '/runs/$runId'
+      preLoaderRoute: typeof RunsRunIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  DefectsRoute: DefectsRoute,
   PlansRoute: PlansRoute,
   ProcessesRoute: ProcessesRoute,
   RequirementsRoute: RequirementsRoute,
   ScenariosRoute: ScenariosRoute,
   TestCasesRoute: TestCasesRoute,
+  RunsRunIdRoute: RunsRunIdRoute,
   RunsIndexRoute: RunsIndexRoute,
 }
 export const routeTree = rootRouteImport

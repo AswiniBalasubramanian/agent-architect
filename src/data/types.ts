@@ -39,7 +39,7 @@ export interface ConfigValue {
   value: string;
   order: number;
   active: boolean;
-  system?: boolean;
+  system?: boolean | undefined;
 }
 
 export interface CustomField {
@@ -78,9 +78,9 @@ export interface BusinessProcess {
   levelType: string;
   application: string;
   sourceType: "Manual" | "Integration" | "Agent";
-  integrationSource?: string;
-  owner?: ID;
-  description?: string;
+  integrationSource?: string | undefined;
+  owner?: ID | undefined;
+  description?: string | undefined;
   tags: string[];
   createdBy: ID;
   createdOn: string;
@@ -105,7 +105,7 @@ export interface TestStep {
   stepNo: number;
   title: string;
   instruction: string;
-  action?: string;
+  action?: string | undefined;
   expected: string;
 }
 
@@ -182,8 +182,8 @@ export interface TestRunStep {
   instruction: string;
   expected: string;
   status: StepStatus;
-  actual?: string;
-  evidence?: string;
+  actual?: string | undefined;
+  evidence?: string | undefined;
 }
 
 export interface TestRun {
@@ -200,9 +200,9 @@ export interface TestRun {
   status: RunStatus;
   priority: Priority;
   environment: string;
-  executedBy?: ID;
-  executionStart?: string;
-  executionEnd?: string;
+  executedBy?: ID | undefined;
+  executionStart?: string | undefined;
+  executionEnd?: string | undefined;
   steps: TestRunStep[];
 }
 
@@ -220,7 +220,7 @@ export interface Defect {
   reportedBy: ID;
   reportedOn: string;
   slaRuleId: ID;
-  respondedOn?: string;
-  resolvedOn?: string;
+  respondedOn?: string | undefined;
+  resolvedOn?: string | undefined;
   comments: { id: ID; author: ID; on: string; body: string }[];
 }
