@@ -380,11 +380,11 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
               reportedBy: currentUser.id,
               reportedOn: new Date().toISOString(),
               slaRuleId:
-                input.severity === "Sev 1"
+                input.severity === "Critical"
                   ? "sla1"
-                  : input.severity === "Sev 2"
+                  : input.severity === "High"
                     ? "sla2"
-                    : input.severity === "Sev 3"
+                    : input.severity === "Medium"
                       ? "sla3"
                       : "sla4",
               comments: [],

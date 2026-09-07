@@ -47,7 +47,7 @@ function DefectsPage() {
   const [form, setForm] = useState({
     title: "",
     description: "",
-    severity: "Sev 2" as Severity,
+    severity: "High" as Severity,
     priority: "High" as Priority,
     assignee: "u5",
     runId: null as string | null,
@@ -74,7 +74,7 @@ function DefectsPage() {
               ))}
             </Select>
             <Select className="w-32" value={severity} onChange={(e) => setSeverity(e.target.value)} aria-label="Filter by severity">
-              {["All", "Sev 1", "Sev 2", "Sev 3", "Sev 4"].map((s) => (
+              {["All", "Critical", "High", "Medium", "Low"].map((s) => (
                 <option key={s}>{s}</option>
               ))}
             </Select>
@@ -188,7 +188,7 @@ function DefectsPage() {
                     value={active.severity}
                     onChange={(e) => store.updateDefect(active.id, { severity: e.target.value as Severity })}
                   >
-                    {["Sev 1", "Sev 2", "Sev 3", "Sev 4"].map((s) => (
+                    {["Critical", "High", "Medium", "Low"].map((s) => (
                       <option key={s}>{s}</option>
                     ))}
                   </Select>
@@ -294,7 +294,7 @@ function DefectsPage() {
         <div className="grid grid-cols-3 gap-3">
           <Field label="Severity">
             <Select value={form.severity} onChange={(e) => setForm({ ...form, severity: e.target.value as Severity })}>
-              {["Sev 1", "Sev 2", "Sev 3", "Sev 4"].map((s) => (
+              {["Critical", "High", "Medium", "Low"].map((s) => (
                 <option key={s}>{s}</option>
               ))}
             </Select>

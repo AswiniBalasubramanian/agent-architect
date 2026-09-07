@@ -3,7 +3,7 @@ export type ID = string;
 export type RunStatus = "Not Started" | "In Progress" | "Passed" | "Failed" | "Blocked";
 export type StepStatus = "Not Started" | "Passed" | "Failed" | "Blocked";
 export type DefectStatus = "New" | "Triaged" | "In Progress" | "Resolved" | "Closed" | "Rejected";
-export type Severity = "Sev 1" | "Sev 2" | "Sev 3" | "Sev 4";
+export type Severity = "Critical" | "High" | "Medium" | "Low";
 export type Priority = "Critical" | "High" | "Medium" | "Low";
 
 export interface AppUser {

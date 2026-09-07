@@ -42,7 +42,7 @@ function RunDetail() {
   const [defect, setDefect] = useState({
     title: "",
     description: "",
-    severity: "Sev 2" as Severity,
+    severity: "High" as Severity,
     priority: "High" as Priority,
     assignee: "u5",
   });
@@ -219,7 +219,7 @@ function RunDetail() {
         <div className="grid grid-cols-3 gap-3">
           <Field label="Severity">
             <Select value={defect.severity} onChange={(e) => setDefect({ ...defect, severity: e.target.value as Severity })}>
-              {["Sev 1", "Sev 2", "Sev 3", "Sev 4"].map((s) => (
+              {["Critical", "High", "Medium", "Low"].map((s) => (
                 <option key={s}>{s}</option>
               ))}
             </Select>
