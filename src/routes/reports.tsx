@@ -162,7 +162,7 @@ function Reports() {
       const passed = runs.filter((r) => r.status === "Passed").length;
       return {
         id: req.id,
-        key: req.key,
+        key: `${req.status} · ${req.priority}`,
         name: req.name,
         cases: cases.length,
         runs: runs.length,
@@ -190,8 +190,8 @@ function Reports() {
       ]));
     } else {
       download(open.name, toCsv([
-        ["Requirement", "Name", "Coverage", "Test cases", "Runs", "Passed", "Defects"],
-        ...filteredTrace.map((r) => [r.key, r.name, r.coverage, r.cases, r.runs, r.passed, r.defects]),
+        ["Requirement id", "Name", "Coverage", "Test cases", "Runs", "Passed", "Defects"],
+        ...filteredTrace.map((r) => [r.id, r.name, r.coverage, r.cases, r.runs, r.passed, r.defects]),
       ]));
     }
   };
