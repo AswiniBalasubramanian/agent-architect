@@ -1,7 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { Caps, Panel, PageHeader, StatusPill, SeverityPill } from "@/components/ui-kit";
-import { useStore, userName } from "@/store/app-store";
+import { CardsSkeleton, Caps, Panel, PageHeader, StatusPill, SeverityPill, TableSkeleton } from "@/components/ui-kit";
+import { AiAssist } from "@/components/ai-assist";
+import { executionSummary } from "@/lib/ai";
+import { organizations, projects, useStore, userName } from "@/store/app-store";
+import { personaById } from "@/data/personas";
+import { useSimulatedLoad } from "@/hooks/use-simulated-load";
 import { formatDuration, slaState } from "@/lib/sla";
 import type { RunStatus } from "@/data/types";
 
@@ -27,7 +31,11 @@ export const Route = createFileRoute("/")({
 function Dashboard() {
   const store = useStore();
   const now = new Date("2026-09-07T14:32:00Z").getTime();
-  const runs = store.runs.filter((r) => r.projectId === store.activeProjectId);
+  const persona = personaById(store.personaId);
+  const ready = useSimulatedLoad(`${store.activeProjectId}:${store.personaId}`);
+  const project = projects.find((p) => p.id === store.activeProjectId)!;
+  const org = organizations.find((o) => o.id === project.orgId)!;
+  const runs = store.runs;
   const count = (s: RunStatus) => runs.filter((r) => r.status === s).length;
   const executed = count("Passed") + count("Failed");
   const passRate = executed ? Math.round((count("Passed") / executed) * 1000) / 10 : 0;
@@ -48,7 +56,6 @@ function Dashboard() {
   const covered = coverage.filter((c) => c.cases > 0).length;
 
   const byPlan = store.plans
-    .filter((p) => p.projectId === store.activeProjectId)
     .map((plan) => {
       const planRuns = runs.filter((r) => r.planId === plan.id);
       const done = planRuns.filter((r) => r.status === "Passed" || r.status === "Failed").length;
@@ -56,10 +63,22 @@ function Dashboard() {
     });
 
   return (
-    <AppShell breadcrumbs={["Dashboard", "Nortaxis Systems", "Sprint 14"]}>
+    <AppShell breadcrumbs={[org.name, project.name, "Dashboard"]}>
       <PageHeader
-        title="Execution Dashboard"
-        subtitle={`${runs.length} runs in scope · ${store.cases.length} master test cases · ${openDefects.length} open defects`}
+        title={
+          persona.focus === "execution"
+            ? "My Execution"
+            : persona.focus === "readonly"
+              ? "Programme Overview"
+              : persona.focus === "authoring"
+                ? "Content Readiness"
+                : "Execution Dashboard"
+        }
+        subtitle={
+          persona.focus === "execution"
+            ? `${runs.length} runs assigned to you · ${openDefects.length} defects you are involved in`
+            : `${runs.length} runs in scope · ${store.cases.length} master test cases · ${openDefects.length} open defects`
+        }
         actions={
           <>
             <span className="rounded-md bg-card px-2.5 py-1.5 font-mono text-[11px] text-muted-foreground border border-border">
@@ -71,6 +90,42 @@ function Dashboard() {
           </>
         }
       />
+
+      {!ready ? (
+        <>
+          <CardsSkeleton />
+          <TableSkeleton rows={7} label="Loading workspace" />
+        </>
+      ) : (
+      <>
+      {store.can("useAi") ? (
+        <AiAssist
+          title="Execution summary"
+          hint={`Reads the ${runs.length} runs and ${openDefects.length} open defects in scope and writes the stand-up summary.`}
+          cta="Summarise"
+          produce={() =>
+            executionSummary({
+              passed: count("Passed"),
+              failed: count("Failed"),
+              blocked: count("Blocked"),
+              inProgress: count("In Progress"),
+              notStarted: count("Not Started"),
+              breached: openDefects.filter((d) => slaState(d, store.slaRules, now).breached).length,
+              planNames: byPlan.filter((p) => p.failed > 0).map((p) => p.plan.name),
+            })
+          }
+          render={(lines) => (
+            <ul className="space-y-1.5">
+              {lines.map((line) => (
+                <li key={line} className="flex gap-2">
+                  <span className="mt-1.5 size-1 shrink-0 rounded-full bg-foreground/50" />
+                  <span>{line}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        />
+      ) : null}
 
       <div className="grid grid-cols-12 gap-3">
         <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-7">
@@ -300,6 +355,8 @@ function Dashboard() {
             })}
         </div>
       </Panel>
+      </>
+      )}
     </AppShell>
   );
 }
