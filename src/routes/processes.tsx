@@ -80,6 +80,23 @@ function ProcessesPage() {
     return out;
   }, [childrenOf, collapsed, view]);
 
+  const visibleRows = useMemo(
+    () => (activeFilterCount ? rows.filter((r) => matchesFilters(r.node)) : rows),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [rows, filters],
+  );
+
+  const columnDefs = [
+    { id: "levelType", label: "Level type" },
+    { id: "application", label: "Application" },
+    { id: "owner", label: "Owner" },
+    { id: "coverage", label: "Coverage" },
+    { id: "source", label: "Source" },
+  ] as const;
+  type ColumnId = (typeof columnDefs)[number]["id"];
+  const visibleCols = columnDefs.filter((c) => columns[c.id]);
+  const gridTemplate = `80px minmax(0,2fr) ${visibleCols.map((c) => (c.id === "coverage" ? "120px" : c.id === "source" ? "80px" : "minmax(0,1fr)")).join(" ")}`;
+
   const levelTypes = store.config.filter((c) => c.group === "Level Type" && c.active);
   const applications = store.config.filter((c) => c.group === "Application" && c.active);
 
