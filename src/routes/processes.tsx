@@ -297,11 +297,14 @@ function ProcessesPage() {
         </div>
       ) : (
         <Panel className="overflow-x-auto p-0">
-          <div className="grid min-w-[900px] grid-cols-[80px_minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_120px_80px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
-            <span>WBS</span><span>NAME</span><span>LEVEL TYPE</span><span>APPLICATION</span><span>OWNER</span><span>COVERAGE</span><span className="text-right">SOURCE</span>
+          <div className="grid min-w-[900px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground" style={{ gridTemplateColumns: gridTemplate }}>
+            <span>WBS</span><span>NAME</span>
+            {visibleCols.map((col) => (
+              <span key={col.id} className={col.id === "source" ? "text-right" : ""}>{col.label.toUpperCase()}</span>
+            ))}
           </div>
           <div className="min-w-[900px] divide-y divide-border text-[12px]">
-            {rows.map(({ node, depth, wbs }) => {
+            {visibleRows.map(({ node, depth, wbs }) => {
               const kids = childrenOf.get(node.id) ?? [];
               const cov = coverage(node.id);
               return (
