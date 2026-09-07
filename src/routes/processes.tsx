@@ -262,22 +262,30 @@ function ProcessesPage() {
                   </span>
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-[11px]">
-                  <div>
-                    <Caps>Level type</Caps>
-                    <div className="mt-1 truncate text-foreground">{node.levelType}</div>
-                  </div>
-                  <div>
-                    <Caps>Application</Caps>
-                    <div className="mt-1 truncate font-mono text-[10px] text-foreground">{node.application}</div>
-                  </div>
-                  <div>
-                    <Caps>Owner</Caps>
-                    <div className="mt-1 truncate text-foreground">{userName(node.owner)}</div>
-                  </div>
-                  <div>
-                    <Caps>Coverage</Caps>
-                    <div className="mt-1 font-mono text-[10px] text-foreground">{cov.cases} cases · {cov.passed} pass</div>
-                  </div>
+                  {columns.levelType && (
+                    <div>
+                      <Caps>Level type</Caps>
+                      <div className="mt-1 truncate text-foreground">{node.levelType}</div>
+                    </div>
+                  )}
+                  {columns.application && (
+                    <div>
+                      <Caps>Application</Caps>
+                      <div className="mt-1 truncate font-mono text-[10px] text-foreground">{node.application}</div>
+                    </div>
+                  )}
+                  {columns.owner && (
+                    <div>
+                      <Caps>Owner</Caps>
+                      <div className="mt-1 truncate text-foreground">{userName(node.owner)}</div>
+                    </div>
+                  )}
+                  {columns.coverage && (
+                    <div>
+                      <Caps>Coverage</Caps>
+                      <div className="mt-1 font-mono text-[10px] text-foreground">{cov.cases} cases · {cov.passed} pass</div>
+                    </div>
+                  )}
                 </div>
                 <div className="mt-4 flex items-center justify-between border-t border-border pt-3 font-mono text-[9px] text-muted-foreground">
                   <span className="truncate pr-3">{parent ? `Under ${parent.name}` : "Root process"}</span>
