@@ -80,6 +80,7 @@ function RunDetail() {
               </Button>
             ) : null}
             <Select
+              disabled={!canExecute}
               value={run.status}
               onChange={(e) => store.updateRun(run.id, { status: e.target.value as RunStatus })}
               className="w-36"
