@@ -74,53 +74,82 @@ function Dashboard() {
 
       <div className="grid grid-cols-12 gap-3">
         <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-7">
-          <div className="border-b border-border px-5 py-4">
-            <h2 className="text-[15px] font-semibold">Execution progress</h2>
-            <p className="mt-0.5 text-[12px] text-muted-foreground">Overall result for the current testing scope</p>
+          <div className="flex items-center justify-between gap-3 px-5 pt-4">
+            <h2 className="text-[14px] font-semibold">
+              {count("Failed") ? "Failures need attention" : "All executions healthy"}
+            </h2>
+            <span className="rounded-md border border-border px-2.5 py-1 text-[11px] text-muted-foreground">
+              {passRate}% pass
+            </span>
           </div>
-          <div className="grid items-center gap-6 px-5 py-5 sm:grid-cols-[190px_1fr]">
-            <div className="relative mx-auto size-44" aria-label={`${passRate}% pass rate`}>
-              <svg className="size-full -rotate-90" viewBox="0 0 120 120" aria-hidden="true">
-                <circle cx="60" cy="60" r="46" fill="none" stroke="currentColor" strokeWidth="14" className="text-muted" />
-                <circle
-                  cx="60"
-                  cy="60"
-                  r="46"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="14"
-                  pathLength="100"
-                  strokeDasharray={`${passRate} ${100 - passRate}`}
-                  className="text-pass"
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span className="font-display text-[27px] leading-none font-semibold">{passRate}%</span>
-                <span className="mt-1 font-mono text-[10px] text-muted-foreground">{count("Passed")} of {executed} passed</span>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-              {[
-                { label: "Passed", value: count("Passed"), tone: "bg-pass" },
-                { label: "Failed", value: count("Failed"), tone: "bg-fail" },
-                { label: "In progress", value: count("In Progress"), tone: "bg-run" },
-                { label: "Blocked", value: count("Blocked"), tone: "bg-block" },
-              ].map((item) => (
-                <div key={item.label} className="border-b border-border pb-3">
-                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                    <span className={`size-2 rounded-full ${item.tone}`} />
-                    {item.label}
+
+          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-border px-5 pb-3 text-[11px] text-muted-foreground">
+            {[
+              { label: "Passed", value: count("Passed"), tone: "bg-pass" },
+              { label: "In progress", value: count("In Progress"), tone: "bg-run" },
+              { label: "Blocked", value: count("Blocked"), tone: "bg-block" },
+              { label: "Failed", value: count("Failed"), tone: "bg-fail" },
+              { label: "Not started", value: count("Not Started"), tone: "bg-pending" },
+            ].map((item) => (
+              <span key={item.label} className="inline-flex items-center gap-1.5">
+                <i className={`size-2 rounded-full ${item.tone}`} />
+                {item.label}
+                <b className="font-medium text-foreground">{item.value}</b>
+              </span>
+            ))}
+          </div>
+
+          <div className="space-y-2 p-3">
+            {byPlan.map(({ plan, total, done, failed }, planIndex) => {
+              const planRuns = runs.filter((r) => r.planId === plan.id);
+              const healthy = failed === 0;
+              return (
+                <div key={plan.id} className="rounded-lg border border-border">
+                  <div className="flex items-center justify-between gap-3 px-3.5 py-2.5">
+                    <span className="truncate text-[12.5px] font-medium">{plan.name}</span>
+                    <span className={`shrink-0 text-[11.5px] font-medium ${healthy ? "text-pass" : "text-fail"}`}>
+                      {healthy ? "Operational" : `${failed} failing`}
+                    </span>
                   </div>
-                  <div className="mt-1 font-display text-xl font-semibold">{item.value}</div>
+                  {planIndex === 0 ? (
+                    <div className="border-t border-border px-3.5 pt-3 pb-2.5">
+                      <div className="flex h-9 items-stretch gap-[3px]">
+                        {planRuns.slice(0, 34).map((r) => (
+                          <span
+                            key={r.id}
+                            title={`${r.key} · ${r.status}`}
+                            className={`flex-1 rounded-[2px] ${
+                              r.status === "Passed"
+                                ? "bg-pass"
+                                : r.status === "Failed"
+                                  ? "bg-fail"
+                                  : r.status === "Blocked"
+                                    ? "bg-block"
+                                    : r.status === "In Progress"
+                                      ? "bg-run"
+                                      : "bg-pending/50"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <div className="mt-2 flex items-center justify-between font-mono text-[10px] text-muted-foreground">
+                        <span>{plan.startDate}</span>
+                        <span>{done}/{total} executed</span>
+                        <span>{plan.endDate}</span>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
+
           <div className="flex items-center justify-between border-t border-border px-5 py-3 text-[11px] text-muted-foreground">
             <span>{runs.length} total runs</span>
             <Link to="/runs" className="font-medium text-foreground hover:text-primary">View executions →</Link>
           </div>
         </Panel>
+
 
         <Panel className="col-span-6 flex flex-col justify-between p-4 lg:col-span-2">
           <Caps>Defects</Caps>
