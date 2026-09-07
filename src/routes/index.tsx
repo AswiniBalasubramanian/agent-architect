@@ -26,6 +26,7 @@ export const Route = createFileRoute("/")({
 
 function Dashboard() {
   const store = useStore();
+  const now = new Date("2026-09-07T14:32:00Z").getTime();
   const runs = store.runs.filter((r) => r.projectId === store.activeProjectId);
   const count = (s: RunStatus) => runs.filter((r) => r.status === s).length;
   const executed = count("Passed") + count("Failed");
@@ -33,7 +34,7 @@ function Dashboard() {
 
   const openDefects = store.defects.filter((d) => !["Closed", "Rejected"].includes(d.status));
   const slaWatch = openDefects
-    .map((d) => ({ defect: d, sla: slaState(d, store.slaRules) }))
+    .map((d) => ({ defect: d, sla: slaState(d, store.slaRules, now) }))
     .filter((x) => !x.sla.closed)
     .sort((a, b) => a.sla.msRemaining - b.sla.msRemaining)
     .slice(0, 4);
@@ -103,7 +104,7 @@ function Dashboard() {
           <div className="mt-1 flex items-center gap-1.5 text-[11px]">
             <span className="size-1.5 rounded-full bg-fail" />
             <span className="font-mono text-fail">
-              {openDefects.filter((d) => slaState(d, store.slaRules).breached).length} SLA breach
+              {openDefects.filter((d) => slaState(d, store.slaRules, now).breached).length} SLA breach
             </span>
           </div>
         </Panel>
