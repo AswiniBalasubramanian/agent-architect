@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ChevronDown, ChevronRight, Grid3X3, ListTree } from "lucide-react";
+import { ChevronDown, ChevronRight, Grid3X3, ListTree, SlidersHorizontal, Columns3, X } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button, Caps, Field, Modal, PageHeader, Panel, Select, TextInput } from "@/components/ui-kit";
 import { useStore, userName, users } from "@/store/app-store";
