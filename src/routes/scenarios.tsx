@@ -68,7 +68,7 @@ function ScenariosPage() {
       <PageHeader
         title="Test Scenarios"
         subtitle={`${store.scenarios.length} reusable end-to-end flows · pulled into plans as a bulk selection shortcut`}
-        actions={<Button onClick={() => setCreating(true)}>New scenario</Button>}
+        actions={canEdit ? <Button onClick={() => setCreating(true)}>New scenario</Button> : undefined}
       />
 
       <div className="grid grid-cols-12 gap-3">

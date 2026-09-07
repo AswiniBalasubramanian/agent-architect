@@ -103,7 +103,7 @@ function TestCasesPage() {
         actions={
           <>
             <TextInput value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search cases…" className="w-52" />
-            <Button onClick={() => setCreating(true)}>New test case</Button>
+            {canEdit ? <Button onClick={() => setCreating(true)}>New test case</Button> : null}
           </>
         }
       />

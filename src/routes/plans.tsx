@@ -99,7 +99,7 @@ function PlansPage() {
       <PageHeader
         title="Test Plans"
         subtitle={`${store.plans.length} plans in this project · runs are created by adding test cases to a plan`}
-        actions={<Button onClick={() => setCreating(true)}>New test plan</Button>}
+        actions={canEdit ? <Button onClick={() => setCreating(true)}>New test plan</Button> : undefined}
       />
 
       <div className="grid grid-cols-12 gap-3">

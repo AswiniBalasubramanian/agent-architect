@@ -81,7 +81,7 @@ function RequirementsPage() {
               placeholder="Filter requirements…"
               className="w-52"
             />
-            <Button onClick={() => setCreating(true)}>New requirement</Button>
+            {canEdit ? <Button onClick={() => setCreating(true)}>New requirement</Button> : null}
           </>
         }
       />
