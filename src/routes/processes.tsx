@@ -136,6 +136,99 @@ function ProcessesPage() {
                 </button>
               ))}
             </div>
+            <div className="relative">
+              <Button variant="ghost" onClick={() => { setFilterOpen((o) => !o); setColumnsOpen(false); }} className="gap-1.5">
+                <SlidersHorizontal className="size-3.5" />
+                Filter
+                {activeFilterCount > 0 && (
+                  <span className="grid size-4 place-items-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
+                    {activeFilterCount}
+                  </span>
+                )}
+              </Button>
+              {filterOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setFilterOpen(false)} />
+                  <div className="absolute right-0 z-50 mt-2 w-64 space-y-3 rounded-lg border border-border bg-popover p-4 shadow-xl">
+                    <div className="flex items-center justify-between">
+                      <Caps>Filter processes</Caps>
+                      <button type="button" onClick={() => setFilterOpen(false)} className="text-muted-foreground hover:text-foreground" aria-label="Close filters">
+                        <X className="size-4" />
+                      </button>
+                    </div>
+                    <Field label="Level type">
+                      <Select value={filters.levelType} onChange={(e) => setFilters({ ...filters, levelType: e.target.value })}>
+                        <option value="">All</option>
+                        {levelTypes.map((l) => (
+                          <option key={l.id}>{l.value}</option>
+                        ))}
+                      </Select>
+                    </Field>
+                    <Field label="Application">
+                      <Select value={filters.application} onChange={(e) => setFilters({ ...filters, application: e.target.value })}>
+                        <option value="">All</option>
+                        {applications.map((l) => (
+                          <option key={l.id}>{l.value}</option>
+                        ))}
+                      </Select>
+                    </Field>
+                    <Field label="Owner">
+                      <Select value={filters.owner} onChange={(e) => setFilters({ ...filters, owner: e.target.value })}>
+                        <option value="">All</option>
+                        {users.map((u) => (
+                          <option key={u.id} value={u.id}>{u.name}</option>
+                        ))}
+                      </Select>
+                    </Field>
+                    <Field label="Source">
+                      <Select value={filters.source} onChange={(e) => setFilters({ ...filters, source: e.target.value })}>
+                        <option value="">All</option>
+                        <option>Manual</option>
+                        <option>Integration</option>
+                        <option>Agent</option>
+                      </Select>
+                    </Field>
+                    {activeFilterCount > 0 && (
+                      <Button variant="ghost" className="w-full" onClick={() => setFilters({ levelType: "", application: "", owner: "", source: "" })}>
+                        Clear all filters
+                      </Button>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="relative">
+              <Button variant="ghost" onClick={() => { setColumnsOpen((o) => !o); setFilterOpen(false); }} className="gap-1.5">
+                <Columns3 className="size-3.5" />
+                Columns
+              </Button>
+              {columnsOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setColumnsOpen(false)} />
+                  <div className="absolute right-0 z-50 mt-2 w-52 rounded-lg border border-border bg-popover p-4 shadow-xl">
+                    <div className="flex items-center justify-between">
+                      <Caps>Toggle columns</Caps>
+                      <button type="button" onClick={() => setColumnsOpen(false)} className="text-muted-foreground hover:text-foreground" aria-label="Close columns">
+                        <X className="size-4" />
+                      </button>
+                    </div>
+                    <div className="mt-3 space-y-2">
+                      {columnDefs.map((col) => (
+                        <label key={col.id} className="flex cursor-pointer items-center gap-2.5 text-[13px] text-foreground">
+                          <input
+                            type="checkbox"
+                            checked={columns[col.id]}
+                            onChange={() => setColumns({ ...columns, [col.id]: !columns[col.id] })}
+                            className="size-4 accent-[var(--primary)]"
+                          />
+                          {col.label}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
             <Button onClick={() => setCreating({ parentId: selected })}>
               {selected ? "Add child node" : "Add root node"}
             </Button>
