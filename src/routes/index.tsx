@@ -205,9 +205,6 @@ function Dashboard() {
                     {failed ? <span className="ml-2 text-fail">{failed} failed</span> : null}
                   </div>
                 </div>
-                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
-                  <div className="h-full rounded-full bg-pass" style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
-                </div>
               </Link>
             ))}
           </div>
@@ -235,12 +232,6 @@ function Dashboard() {
                       {formatDuration(sla.msRemaining)}
                     </div>
                   </div>
-                </div>
-                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
-                  <div
-                    className={`h-full rounded-full ${sla.breached ? "bg-fail" : "bg-warn"}`}
-                    style={{ width: `${sla.percentElapsed}%` }}
-                  />
                 </div>
               </div>
             ))}
