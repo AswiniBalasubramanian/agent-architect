@@ -15,6 +15,8 @@ import {
 } from "@/components/ui-kit";
 import { organizations, projects, useStore, userName } from "@/store/app-store";
 import { CardsSkeleton, TableSkeleton } from "@/components/ui-kit";
+import { AiAssist } from "@/components/ai-assist";
+import { draftSteps } from "@/lib/ai";
 import { useSimulatedLoad } from "@/hooks/use-simulated-load";
 import type { Priority, TestStep } from "@/data/types";
 import { cn } from "@/lib/utils";
@@ -188,6 +190,42 @@ function TestCasesPage() {
                   </Button>
                 ) : null}
               </div>
+
+              {store.can("useAi") && canEdit ? (
+                <div className="border-b border-border p-3">
+                  <AiAssist
+                    className="shadow-none"
+                    title="Draft steps"
+                    hint="Writes an ordered step set for this case; review it, then save as a new version."
+                    cta="Draft steps"
+                    produce={() => draftSteps(active.name, active.application, active.testingType)}
+                    acceptLabel="Open in step editor"
+                    onAccept={(steps) => {
+                      setDraft(
+                        steps.map((st, i) => ({
+                          id: `ai-${i}-${st.title.toLowerCase().replace(/\W+/g, "-")}`,
+                          stepNo: i + 1,
+                          title: st.title,
+                          instruction: st.instruction,
+                          action: st.action,
+                          expected: st.expected,
+                        })),
+                      );
+                      setChangeNote("Steps drafted with the assistant");
+                      setEditing(true);
+                    }}
+                    render={(steps) => (
+                      <ol className="list-decimal space-y-1.5 pl-4">
+                        {steps.map((st) => (
+                          <li key={st.title}>
+                            <b>{st.title}</b> — {st.instruction} <span className="text-muted-foreground">Expected: {st.expected}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    )}
+                  />
+                </div>
+              ) : null}
 
               <div className="grid grid-cols-4 gap-3 border-b border-border px-4 py-3 text-[11px]">
                 <div>

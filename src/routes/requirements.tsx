@@ -15,6 +15,8 @@ import {
 } from "@/components/ui-kit";
 import { organizations, projects, useStore, userName, users } from "@/store/app-store";
 import { CardsSkeleton, TableSkeleton } from "@/components/ui-kit";
+import { AiAssist } from "@/components/ai-assist";
+import { draftCasesForRequirement } from "@/lib/ai";
 import { useSimulatedLoad } from "@/hooks/use-simulated-load";
 import type { Priority } from "@/data/types";
 import { cn } from "@/lib/utils";
@@ -215,6 +217,44 @@ function RequirementsPage() {
                 </div>
               </div>
 
+              {store.can("useAi") ? (
+                <div className="border-b border-border p-3">
+                  <AiAssist
+                    className="shadow-none"
+                    title="Draft test cases"
+                    hint="Proposes the coverage set this requirement needs, ready to add to the repository."
+                    cta="Draft coverage"
+                    disabled={!canEdit}
+                    produce={() => draftCasesForRequirement(active.name, active.priority)}
+                    acceptLabel="Add to repository"
+                    onAccept={(drafts) => {
+                      if (!canEdit) return;
+                      drafts.forEach((d) =>
+                        store.addTestCase({
+                          name: d.name,
+                          folderId: store.folders[0]?.id ?? "f2",
+                          testingType: d.testingType,
+                          priority: d.priority,
+                          description: d.rationale,
+                        }),
+                      );
+                    }}
+                    render={(drafts) => (
+                      <ul className="space-y-2">
+                        {drafts.map((d) => (
+                          <li key={d.name}>
+                            <div className="font-medium">{d.name}</div>
+                            <div className="text-muted-foreground">
+                              {d.testingType} · {d.priority} · {d.rationale}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  />
+                </div>
+              ) : null}
+
               <div className="px-4 py-3">
                 <Caps className="mb-2">Traceability</Caps>
                 <div className="grid grid-cols-3 gap-3 text-center">
@@ -231,7 +271,7 @@ function RequirementsPage() {
                     <div className="font-mono text-[10px] text-muted-foreground">defects</div>
                   </div>
                 </div>
-                <div className="mt-3 flex justify-end">
+                <div className={canEdit ? "mt-3 flex justify-end" : "hidden"}>
                   <Button variant="danger" onClick={() => { store.deleteRequirement(active.id); setSelected(null); }}>
                     Delete requirement
                   </Button>
