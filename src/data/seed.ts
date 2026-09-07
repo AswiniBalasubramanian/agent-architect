@@ -459,7 +459,7 @@ export const testRuns: TestRun[] = (() => {
         assignee: users[(n + 2) % users.length]!.id,
         status,
         priority: tc.priority,
-        environment: planId === "pl2" ? "uat-sap-01" : (envs[n % envs.length],
+        environment: planId === "pl2" ? "uat-sap-01" : envs[n % envs.length]!,
         executedBy: status === "Not Started" ? undefined : users[(n + 2) % users.length]!.id,
         executionStart: status === "Not Started" ? undefined : iso(6 - (n % 5), 8),
         executionEnd: status === "Passed" || status === "Failed" ? iso(6 - (n % 5), 11) : undefined,
