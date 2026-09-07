@@ -14,6 +14,7 @@ import {
   Menu,
   Network,
   Search,
+  UserCog,
   Settings2,
   TestTube2,
   X,
@@ -30,7 +31,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { currentUser, organizations, projects, useStore } from "@/store/app-store";
+import { organizations, projects, useStore } from "@/store/app-store";
+import { personas } from "@/data/personas";
 import { slaState } from "@/lib/sla";
 import { cn } from "@/lib/utils";
 
@@ -74,6 +76,12 @@ export function AppShell({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const me = store.me;
+  const persona = personas.find((p) => p.id === store.personaId) ?? personas[0]!;
+  const visibleGroups = navGroups
+    .map((g) => ({ ...g, items: g.items.filter((i) => persona.routes.includes(i.to)) }))
+    .filter((g) => g.items.length > 0);
 
   const project = projects.find((p) => p.id === store.activeProjectId) ?? projects[0];
   if (!project) return null;
@@ -166,7 +174,7 @@ export function AppShell({
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 py-2">
-        {navGroups.map((group, groupIndex) => (
+        {visibleGroups.map((group, groupIndex) => (
           <div key={group.heading} className={cn(groupIndex > 0 && (collapsed && !mobile ? "mt-3 border-t border-border pt-3" : "mt-4"))}>
             {collapsed && !mobile ? null : (
               <div className="px-3 pb-1.5 text-[11px] font-medium text-muted-foreground">{group.heading}</div>
@@ -203,11 +211,11 @@ export function AppShell({
       </nav>
 
       <div className={cn("border-t border-border p-2", collapsed && !mobile ? "flex justify-center" : "flex items-center gap-2.5")}>
-        <div className="grid size-8 shrink-0 place-items-center rounded-full bg-muted text-[11px] font-semibold">{currentUser.initials}</div>
+        <div className="grid size-8 shrink-0 place-items-center rounded-full bg-muted text-[11px] font-semibold">{me.initials}</div>
         {collapsed && !mobile ? null : (
           <div className="min-w-0 leading-tight">
-            <div className="truncate text-xs font-medium">{currentUser.name}</div>
-            <div className="truncate text-[10px] text-muted-foreground">{currentUser.role}</div>
+            <div className="truncate text-xs font-medium">{me.name}</div>
+            <div className="truncate text-[10px] text-muted-foreground">{persona.label}</div>
           </div>
         )}
       </div>
@@ -259,7 +267,31 @@ export function AppShell({
                   {slaOpen} SLA risks
                 </div>
               ) : null}
-              <div className="grid size-8 place-items-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground">{currentUser.initials}</div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="flex h-8 items-center gap-2 rounded-md border border-input bg-background pl-2 pr-2.5 text-xs shadow-sm hover:bg-muted"
+                    aria-label="Switch persona"
+                  >
+                    <UserCog className="size-3.5 text-muted-foreground" />
+                    <span className="hidden sm:inline">{persona.short}</span>
+                    <ChevronDown className="size-3 text-muted-foreground" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" sideOffset={6} className="w-72 rounded-xl">
+                  <DropdownMenuLabel className="text-xs text-muted-foreground">View the workspace as</DropdownMenuLabel>
+                  {personas.map((item) => (
+                    <DropdownMenuItem key={item.id} onSelect={() => store.setPersona(item.id)} className="items-start gap-2">
+                      <Check className={cn("mt-0.5 size-3.5 shrink-0", item.id === persona.id ? "text-foreground" : "text-transparent")} />
+                      <div className="min-w-0 leading-tight">
+                        <div className="text-[13px]">{item.label}</div>
+                        <div className="text-[11px] text-muted-foreground">{item.summary}</div>
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <div className="grid size-8 place-items-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground">{me.initials}</div>
             </div>
           </header>
           <main className="space-y-4 p-3 sm:p-5">{children}</main>

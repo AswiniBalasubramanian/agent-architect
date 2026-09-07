@@ -354,3 +354,58 @@ export function Tooltip({ content, children }: { content: string; children: Reac
     </span>
   );
 }
+
+export function Skeleton({ className }: { className?: string }) {
+  return <div className={cn("animate-pulse rounded-md bg-muted", className)} />;
+}
+
+/** Placeholder shown while a scoped dataset loads after a project/persona switch. */
+export function TableSkeleton({ rows = 6, label }: { rows?: number; label?: string }) {
+  return (
+    <div className="panel p-4">
+      {label ? <Caps className="mb-3">{label}</Caps> : null}
+      <div className="space-y-2">
+        {Array.from({ length: rows }).map((_, i) => (
+          <div key={i} className="flex items-center gap-3">
+            <Skeleton className="h-4 w-4 shrink-0 rounded" />
+            <Skeleton className="h-4 flex-1" />
+            <Skeleton className="hidden h-4 w-24 sm:block" />
+            <Skeleton className="hidden h-4 w-16 md:block" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function CardsSkeleton({ cards = 3 }: { cards?: number }) {
+  return (
+    <div className="grid grid-cols-12 gap-3">
+      {Array.from({ length: cards }).map((_, i) => (
+        <div key={i} className="panel col-span-12 space-y-3 p-4 md:col-span-4">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-7 w-16" />
+          <Skeleton className="h-2.5 w-full" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function Spinner({ className }: { className?: string }) {
+  return (
+    <span
+      className={cn("inline-block size-3.5 animate-spin rounded-full border-2 border-current border-t-transparent", className)}
+      aria-hidden
+    />
+  );
+}
+
+export function NoAccess({ what }: { what: string }) {
+  return (
+    <div className="panel px-4 py-12 text-center">
+      <div className="text-[13px] font-medium">Not available for this persona</div>
+      <p className="mx-auto mt-2 max-w-md text-[12px] text-muted-foreground">{what}</p>
+    </div>
+  );
+}
