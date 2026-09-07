@@ -27,7 +27,7 @@ export function AppShell({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [switcherOpen, setSwitcherOpen] = useState(false);
 
-  const project = projects.find((p) => p.id === store.activeProjectId) ?? projects[0];
+  const project = projects.find((p) => p.id === store.activeProjectId) ?? projects[0]!;
   const org = organizations.find((o) => o.id === project.orgId)!;
   const slaOpen = store.defects.filter((d) => {
     const s = slaState(d, store.slaRules);

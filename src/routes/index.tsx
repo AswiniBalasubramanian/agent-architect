@@ -134,8 +134,7 @@ function Dashboard() {
             {byPlan.map(({ plan, total, done, failed }) => (
               <Link
                 key={plan.id}
-                to="/plans/$planId"
-                params={{ planId: plan.id }}
+                to="/plans"
                 className="block px-4 py-3 hover:bg-white/70"
               >
                 <div className="flex items-center justify-between">

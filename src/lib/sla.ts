@@ -3,7 +3,7 @@ import type { Defect, SlaRule } from "@/data/types";
 const HOUR = 1000 * 60 * 60;
 
 export interface SlaState {
-  rule?: SlaRule;
+  rule?: SlaRule | undefined;
   dueAt: number;
   msRemaining: number;
   breached: boolean;

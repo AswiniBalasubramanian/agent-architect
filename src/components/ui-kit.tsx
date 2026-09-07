@@ -87,12 +87,14 @@ export function PriorityTag({ priority }: { priority: Priority }) {
 
 export function Meter({
   segments,
+  className,
 }: {
   segments: { value: number; className: string; label?: string }[];
+  className?: string;
 }) {
   const total = segments.reduce((a, s) => a + s.value, 0) || 1;
   return (
-    <div className="flex h-3 w-full overflow-hidden rounded-full bg-line/50">
+    <div className={cn("flex h-3 w-full overflow-hidden rounded-full bg-line/50", className)}>
       {segments.map((s, i) => (
         <div key={i} className={s.className} style={{ width: `${(s.value / total) * 100}%` }} title={s.label} />
       ))}

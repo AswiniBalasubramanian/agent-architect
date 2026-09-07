@@ -138,7 +138,7 @@ function AdminPage() {
         <Panel className="overflow-hidden p-0">
           <div className="grid grid-cols-[minmax(0,1.5fr)_90px_120px_130px_100px] gap-2 border-b border-line px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
             <span>RULE</span>
-            <span>SEVERITY</span>
+            <span>APPLIES TO</span>
             <span>RESPONSE</span>
             <span>RESOLUTION</span>
             <span className="text-right">STATE</span>
@@ -147,7 +147,7 @@ function AdminPage() {
             {store.slaRules.map((r) => (
               <div key={r.id} className="grid grid-cols-[minmax(0,1.5fr)_90px_120px_130px_100px] items-center gap-2 px-4 py-2.5">
                 <span className="font-medium">{r.name}</span>
-                <span className="font-mono text-[10px] text-muted-foreground">{r.severity}</span>
+                <span className="font-mono text-[10px] text-muted-foreground">{r.appliesTo}</span>
                 <span className="font-mono text-[11px]">{r.responseHours}h</span>
                 <span className="font-mono text-[11px]">{r.resolutionHours}h</span>
                 <button
@@ -173,7 +173,7 @@ function AdminPage() {
                 <div>
                   <div className="font-medium">{n.name}</div>
                   <div className="font-mono text-[10px] text-muted-foreground">
-                    {n.event} → {n.recipients} · {n.channel}
+                    {n.trigger} → {n.recipients} · {n.cadence}
                   </div>
                 </div>
                 <button
@@ -195,7 +195,7 @@ function AdminPage() {
         <Panel className="overflow-hidden p-0">
           <div className="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1.5fr)_130px_100px] gap-2 border-b border-line px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
             <span>NAME</span>
-            <span>EMAIL</span>
+            <span>INITIALS</span>
             <span>ROLE</span>
             <span className="text-right">RUNS</span>
           </div>
@@ -203,7 +203,7 @@ function AdminPage() {
             {users.map((u) => (
               <div key={u.id} className="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1.5fr)_130px_100px] items-center gap-2 px-4 py-2.5">
                 <span className="font-medium">{userName(u.id)}</span>
-                <span className="truncate font-mono text-[10px] text-muted-foreground">{u.email}</span>
+                <span className="truncate font-mono text-[10px] text-muted-foreground">{u.initials}</span>
                 <span className="font-mono text-[10px]">{u.role}</span>
                 <span className="text-right font-mono text-[11px] text-muted-foreground">
                   {store.runs.filter((r) => r.assignee === u.id).length}
