@@ -136,6 +136,19 @@ function TestCasesPage() {
             <button
               key={f.id}
               onClick={() => setFolder(f.id)}
+              onDragOver={(e) => {
+                if (canEdit) e.preventDefault();
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (!canEdit) return;
+                const dropped = e.dataTransfer.getData("text/plain");
+                const ids = checked.length && dropped && checked.includes(dropped) ? checked : dropped ? [dropped] : [];
+                if (ids.length) {
+                  store.moveCasesToFolder(ids, f.id);
+                  setChecked([]);
+                }
+              }}
               style={{ paddingLeft: f.parentId ? 22 : 8 }}
               className={cn(
                 "block w-full rounded-md py-1.5 pr-2 text-left text-[12px]",
