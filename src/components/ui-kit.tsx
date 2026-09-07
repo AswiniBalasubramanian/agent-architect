@@ -247,3 +247,15 @@ export function PageHeader({
 export function EmptyState({ children }: { children: ReactNode }) {
   return <div className="px-4 py-10 text-center text-[12px] text-muted-foreground">{children}</div>;
 }
+
+export function Tooltip({ content, children }: { content: string; children: ReactNode }) {
+  return (
+    <span className="group relative inline-flex">
+      {children}
+      <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 hidden w-56 -translate-x-1/2 rounded-md border border-border bg-popover px-2.5 py-2 text-[11px] leading-snug text-popover-foreground shadow-lg group-hover:block">
+        {content}
+        <span className="absolute top-full left-1/2 -mt-1 size-2 -translate-x-1/2 rotate-45 border-r border-b border-border bg-popover" />
+      </span>
+    </span>
+  );
+}
