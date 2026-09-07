@@ -29,6 +29,16 @@ function ProcessesPage() {
   const [selected, setSelected] = useState<string | null>(null);
   const [creating, setCreating] = useState<{ parentId: string | null } | null>(null);
   const [form, setForm] = useState({ name: "", levelType: "Process Step", application: "SAP ERP", owner: "u2" });
+  const [filters, setFilters] = useState({ levelType: "", application: "", owner: "", source: "" });
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [columnsOpen, setColumnsOpen] = useState(false);
+  const [columns, setColumns] = useState({ levelType: true, application: true, owner: true, coverage: true, source: true });
+  const activeFilterCount = Object.values(filters).filter(Boolean).length;
+  const matchesFilters = (node: BusinessProcess) =>
+    (!filters.levelType || node.levelType === filters.levelType) &&
+    (!filters.application || node.application === filters.application) &&
+    (!filters.owner || node.owner === filters.owner) &&
+    (!filters.source || node.sourceType === filters.source);
 
   const childrenOf = useMemo(() => {
     const map = new Map<string | null, BusinessProcess[]>();
