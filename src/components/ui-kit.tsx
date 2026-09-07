@@ -1,3 +1,4 @@
+import { X } from "lucide-react";
 import { type ReactNode } from "react";
 import type { DefectStatus, Priority, RunStatus, Severity, StepStatus } from "@/data/types";
 import { cn } from "@/lib/utils";
@@ -30,7 +31,7 @@ export function StatusPill({ status, className }: { status: RunStatus | StepStat
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] font-semibold",
+        "inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-current/15 px-2 py-0.5 text-[10px] font-medium",
         runTone[status],
         className,
       )}
@@ -52,7 +53,7 @@ const defectTone: Record<DefectStatus, string> = {
 
 export function DefectPill({ status }: { status: DefectStatus }) {
   return (
-    <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold", defectTone[status])}>
+    <span className={cn("inline-flex items-center rounded-md border border-current/15 px-2 py-0.5 text-[10px] font-medium", defectTone[status])}>
       {status}
     </span>
   );
@@ -67,7 +68,7 @@ const sevTone: Record<Severity, string> = {
 
 export function SeverityPill({ severity }: { severity: Severity }) {
   return (
-    <span className={cn("inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold", sevTone[severity])}>
+    <span className={cn("inline-flex items-center gap-1 rounded-md border border-current/15 px-2 py-0.5 text-[10px] font-medium", sevTone[severity])}>
       <i className="size-1.5 rounded-full bg-current" />
       {severity}
     </span>
@@ -131,9 +132,9 @@ export function Button({
   disabled?: boolean;
 }) {
   const styles = {
-    primary: "bg-ink text-paper hover:opacity-90",
-    ghost: "bg-white/70 text-ink ring-1 ring-line hover:bg-white",
-    danger: "bg-fail/10 text-fail ring-1 ring-fail/25 hover:bg-fail/15",
+    primary: "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90",
+    ghost: "border border-border bg-background text-foreground shadow-sm hover:bg-muted",
+    danger: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
   }[variant];
   return (
     <button
@@ -141,7 +142,7 @@ export function Button({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "rounded-md px-3 py-1.5 text-[12px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40",
+        "inline-flex min-h-8 items-center justify-center rounded-md px-3 py-1.5 text-[12px] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40",
         styles,
         className,
       )}
@@ -161,7 +162,7 @@ export function Field({ label, children }: { label: string; children: ReactNode 
 }
 
 const controlClass =
-  "w-full rounded-md bg-white/80 px-2.5 py-1.5 text-[12.5px] text-ink ring-1 ring-line outline-none focus:ring-2 focus:ring-accent";
+  "w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-[12.5px] text-foreground shadow-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
 
 export function TextInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={cn(controlClass, props.className)} />;
@@ -192,12 +193,12 @@ export function Modal({
 }) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink/40 p-6 backdrop-blur-sm">
-      <div className={cn("mt-10 w-full rounded-xl bg-popover shadow-xl ring-1 ring-line", wide ? "max-w-3xl" : "max-w-lg")}>
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-foreground/60 p-4 backdrop-blur-sm sm:p-6">
+      <div className={cn("mt-10 w-full rounded-lg border border-border bg-popover text-popover-foreground shadow-xl", wide ? "max-w-3xl" : "max-w-lg")}>
         <div className="flex items-center justify-between border-b border-line px-4 py-3">
           <h2 className="font-display text-[15px] font-semibold">{title}</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-ink" aria-label="Close">
-            ✕
+          <button onClick={onClose} className="grid size-8 place-items-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground" aria-label="Close">
+            <X className="size-4" />
           </button>
         </div>
         <div className="space-y-3 px-4 py-4">{children}</div>
@@ -217,10 +218,10 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-3">
+    <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-4">
       <div>
-        <h1 className="font-display text-[22px] leading-none font-semibold">{title}</h1>
-        <p className="mt-1.5 font-mono text-[11px] text-muted-foreground">{subtitle}</p>
+        <h1 className="font-display text-2xl leading-none font-semibold">{title}</h1>
+        <p className="mt-2 text-[12px] text-muted-foreground">{subtitle}</p>
       </div>
       {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
     </div>

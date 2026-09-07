@@ -67,8 +67,8 @@ function PlansPage() {
     description: "",
     status: "Planned",
     owner: "u3",
-    startDate: new Date().toISOString().slice(0, 10),
-    endDate: new Date(Date.now() + 12096e5).toISOString().slice(0, 10),
+    startDate: "2026-09-07",
+    endDate: "2026-09-21",
     defaultEnvironment: "QA",
     testingType: "System Integration",
   });
@@ -87,15 +87,15 @@ function PlansPage() {
 
       <div className="grid grid-cols-12 gap-3">
         <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-5">
-          <div className="border-b border-line px-4 py-2.5">
+          <div className="border-b border-border px-4 py-2.5">
             <Caps>Plans</Caps>
           </div>
-          <div className="divide-y divide-line/70">
+          <div className="divide-y divide-border">
             {store.plans.map((p) => (
               <button
                 key={p.id}
                 onClick={() => setSelected(p.id)}
-                className={cn("block w-full px-4 py-3 text-left hover:bg-white/70", selected === p.id && "bg-white/80")}
+                className={cn("block w-full px-4 py-3 text-left hover:bg-muted/70", selected === p.id && "bg-muted")}
               >
                 <div className="flex items-baseline justify-between gap-2">
                   <span className="truncate text-[12.5px] font-medium">{p.name}</span>
@@ -113,7 +113,7 @@ function PlansPage() {
         <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-7">
           {active ? (
             <div>
-              <div className="flex items-start justify-between gap-3 border-b border-line px-4 py-3">
+              <div className="flex items-start justify-between gap-3 border-b border-border px-4 py-3">
                 <div>
                   <Caps>Plan · {active.key}</Caps>
                   <div className="font-display text-[15px] leading-tight font-semibold">{active.name}</div>
@@ -122,7 +122,7 @@ function PlansPage() {
                 <Button onClick={() => { setPicked([]); setAssigning(true); }}>Add test cases</Button>
               </div>
 
-              <div className="grid grid-cols-4 gap-3 border-b border-line px-4 py-3 text-[11px]">
+              <div className="grid grid-cols-4 gap-3 border-b border-border px-4 py-3 text-[11px]">
                 <div>
                   <Caps>Status</Caps>
                   <Select
@@ -151,7 +151,7 @@ function PlansPage() {
                 </div>
               </div>
 
-              <div className="border-b border-line px-4 py-3">
+              <div className="border-b border-border px-4 py-3">
                 <Caps className="mb-2">Execution rollup</Caps>
                 <Meter
                   segments={[
@@ -173,20 +173,20 @@ function PlansPage() {
                 />
               </div>
 
-              <div className="max-h-[380px] overflow-y-auto">
-                <div className="grid grid-cols-[70px_minmax(0,2fr)_110px_minmax(0,1fr)] gap-2 border-b border-line px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
+              <div className="max-h-[380px] overflow-auto">
+                <div className="grid grid-cols-[70px_minmax(0,2fr)_110px_minmax(0,1fr)] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
                   <span>RUN</span>
                   <span>TEST CASE</span>
                   <span>STATUS</span>
                   <span>ASSIGNEE</span>
                 </div>
-                <div className="divide-y divide-line/70 text-[12px]">
+                <div className="divide-y divide-border text-[12px]">
                   {runs.map((r) => (
                     <Link
                       key={r.id}
                       to="/runs/$runId"
                       params={{ runId: r.id }}
-                      className="grid grid-cols-[70px_minmax(0,2fr)_110px_minmax(0,1fr)] items-center gap-2 px-4 py-2 hover:bg-white/70"
+                      className="grid grid-cols-[70px_minmax(0,2fr)_110px_minmax(0,1fr)] items-center gap-2 px-4 py-2 hover:bg-muted/70"
                     >
                       <span className="font-mono text-[10px] text-muted-foreground">{r.key}</span>
                       <span className="truncate">{store.cases.find((c) => c.id === r.testCaseId)?.name}</span>
@@ -233,7 +233,7 @@ function PlansPage() {
             <button
               key={s.id}
               onClick={() => setPicked([...new Set([...picked, ...s.members.map((m) => m.testCaseId)])])}
-              className="rounded-md bg-white/70 px-2 py-1 font-mono text-[10px] ring-1 ring-line hover:bg-white"
+              className="rounded-md bg-card px-2 py-1 font-mono text-[10px] border border-border hover:bg-muted"
             >
               + {s.name}
             </button>
@@ -248,7 +248,7 @@ function PlansPage() {
                 onClick={() => setPicked(on ? picked.filter((x) => x !== c.id) : [...picked, c.id])}
                 className={cn(
                   "flex w-full items-center justify-between rounded-md px-2.5 py-2 text-left text-[12px] ring-1",
-                  on ? "bg-accent/10 ring-accent/30" : "bg-white/70 ring-line",
+                  on ? "bg-accent/10 ring-accent/30" : "bg-card ring-line",
                 )}
               >
                 <span className="truncate">{c.name}</span>

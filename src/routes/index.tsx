@@ -26,6 +26,7 @@ export const Route = createFileRoute("/")({
 
 function Dashboard() {
   const store = useStore();
+  const now = new Date("2026-09-07T14:32:00Z").getTime();
   const runs = store.runs.filter((r) => r.projectId === store.activeProjectId);
   const count = (s: RunStatus) => runs.filter((r) => r.status === s).length;
   const executed = count("Passed") + count("Failed");
@@ -33,7 +34,7 @@ function Dashboard() {
 
   const openDefects = store.defects.filter((d) => !["Closed", "Rejected"].includes(d.status));
   const slaWatch = openDefects
-    .map((d) => ({ defect: d, sla: slaState(d, store.slaRules) }))
+    .map((d) => ({ defect: d, sla: slaState(d, store.slaRules, now) }))
     .filter((x) => !x.sla.closed)
     .sort((a, b) => a.sla.msRemaining - b.sla.msRemaining)
     .slice(0, 4);
@@ -61,10 +62,10 @@ function Dashboard() {
         subtitle={`${runs.length} runs in scope · ${store.cases.length} master test cases · ${openDefects.length} open defects`}
         actions={
           <>
-            <span className="rounded-md bg-white/70 px-2.5 py-1.5 font-mono text-[11px] text-muted-foreground ring-1 ring-line">
-              Env: <b className="text-ink">dev-sap-04</b>
+            <span className="rounded-md bg-card px-2.5 py-1.5 font-mono text-[11px] text-muted-foreground border border-border">
+              Env: <b className="text-foreground">dev-sap-04</b>
             </span>
-            <span className="rounded-md bg-white/70 px-2.5 py-1.5 font-mono text-[11px] text-muted-foreground ring-1 ring-line">
+            <span className="rounded-md bg-card px-2.5 py-1.5 font-mono text-[11px] text-muted-foreground border border-border">
               ⏱ {slaWatch.filter((s) => s.sla.breached || s.sla.atRisk).length} SLA at risk
             </span>
           </>
@@ -103,7 +104,7 @@ function Dashboard() {
           <div className="mt-1 flex items-center gap-1.5 text-[11px]">
             <span className="size-1.5 rounded-full bg-fail" />
             <span className="font-mono text-fail">
-              {openDefects.filter((d) => slaState(d, store.slaRules).breached).length} SLA breach
+              {openDefects.filter((d) => slaState(d, store.slaRules, now).breached).length} SLA breach
             </span>
           </div>
         </Panel>
@@ -113,7 +114,7 @@ function Dashboard() {
           <div className="font-display text-[26px] leading-none font-semibold">
             {Math.round((covered / store.requirements.length) * 100)}%
           </div>
-          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-line/50">
+          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
             <div className="h-full rounded-full bg-accent" style={{ width: `${(covered / store.requirements.length) * 100}%` }} />
           </div>
           <div className="mt-1 font-mono text-[10px] text-muted-foreground">
@@ -124,18 +125,18 @@ function Dashboard() {
 
       <div className="grid grid-cols-12 gap-3">
         <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-7">
-          <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
+          <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
             <Caps>Test plans · {byPlan.length}</Caps>
-            <Link to="/plans" className="font-mono text-[10px] text-muted-foreground hover:text-ink">
+            <Link to="/plans" className="font-mono text-[10px] text-muted-foreground hover:text-foreground">
               view all →
             </Link>
           </div>
-          <div className="divide-y divide-line/70">
+          <div className="divide-y divide-border">
             {byPlan.map(({ plan, total, done, failed }) => (
               <Link
                 key={plan.id}
                 to="/plans"
-                className="block px-4 py-3 hover:bg-white/70"
+                className="block px-4 py-3 hover:bg-muted/70"
               >
                 <div className="flex items-center justify-between">
                   <div className="min-w-0">
@@ -151,7 +152,7 @@ function Dashboard() {
                     {failed ? <span className="ml-2 text-fail">{failed} failed</span> : null}
                   </div>
                 </div>
-                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-line/50">
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
                   <div className="h-full rounded-full bg-pass" style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
                 </div>
               </Link>
@@ -160,13 +161,13 @@ function Dashboard() {
         </Panel>
 
         <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-5">
-          <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
+          <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
             <Caps>SLA watch</Caps>
-            <Link to="/defects" className="font-mono text-[10px] text-muted-foreground hover:text-ink">
+            <Link to="/defects" className="font-mono text-[10px] text-muted-foreground hover:text-foreground">
               all defects →
             </Link>
           </div>
-          <div className="divide-y divide-line/70">
+          <div className="divide-y divide-border">
             {slaWatch.map(({ defect, sla }) => (
               <div key={defect.id} className="px-4 py-3">
                 <div className="flex items-start justify-between gap-3">
@@ -182,7 +183,7 @@ function Dashboard() {
                     </div>
                   </div>
                 </div>
-                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-line/50">
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
                   <div
                     className={`h-full rounded-full ${sla.breached ? "bg-fail" : "bg-warn"}`}
                     style={{ width: `${sla.percentElapsed}%` }}
@@ -194,20 +195,20 @@ function Dashboard() {
         </Panel>
       </div>
 
-      <Panel className="overflow-hidden p-0">
-        <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
+      <Panel className="overflow-x-auto p-0">
+        <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
           <Caps>Latest executions</Caps>
-          <Link to="/runs" className="font-mono text-[10px] text-muted-foreground hover:text-ink">
+          <Link to="/runs" className="font-mono text-[10px] text-muted-foreground hover:text-foreground">
             all runs →
           </Link>
         </div>
-        <div className="grid grid-cols-[minmax(0,1.7fr)_minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1.2fr)] gap-2 border-b border-line px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
+        <div className="grid grid-cols-[minmax(0,1.7fr)_minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1.2fr)] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
           <span>RUN / CASE</span>
           <span>OWNER</span>
           <span>ENV</span>
           <span>STATUS</span>
         </div>
-        <div className="divide-y divide-line/70 text-[12px]">
+        <div className="divide-y divide-border text-[12px]">
           {runs
             .filter((r) => r.executionStart)
             .slice(0, 8)
@@ -218,7 +219,7 @@ function Dashboard() {
                   key={run.id}
                   to="/runs/$runId"
                   params={{ runId: run.id }}
-                  className="grid grid-cols-[minmax(0,1.7fr)_minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1.2fr)] items-center gap-2 px-4 py-2.5 hover:bg-white/70"
+                  className="grid grid-cols-[minmax(0,1.7fr)_minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1.2fr)] items-center gap-2 px-4 py-2.5 hover:bg-muted/70"
                 >
                   <div className="min-w-0">
                     <div className="truncate font-medium">

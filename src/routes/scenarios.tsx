@@ -56,17 +56,17 @@ function ScenariosPage() {
 
       <div className="grid grid-cols-12 gap-3">
         <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-4">
-          <div className="border-b border-line px-4 py-2.5">
+          <div className="border-b border-border px-4 py-2.5">
             <Caps>Scenarios</Caps>
           </div>
-          <div className="divide-y divide-line/70 text-[12px]">
+          <div className="divide-y divide-border text-[12px]">
             {store.scenarios.map((s) => (
               <button
                 key={s.id}
                 onClick={() => setSelected(s.id)}
                 className={cn(
-                  "block w-full px-4 py-3 text-left hover:bg-white/70",
-                  selected === s.id && "bg-white/80",
+                  "block w-full px-4 py-3 text-left hover:bg-muted/70",
+                  selected === s.id && "bg-muted",
                 )}
               >
                 <div className="font-medium">{s.name}</div>
@@ -81,7 +81,7 @@ function ScenariosPage() {
         <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-8">
           {active ? (
             <div>
-              <div className="flex items-start justify-between border-b border-line px-4 py-3">
+              <div className="flex items-start justify-between border-b border-border px-4 py-3">
                 <div>
                   <Caps>Scenario · {active.key}</Caps>
                   <div className="font-display text-[15px] leading-tight font-semibold">{active.name}</div>
@@ -91,7 +91,7 @@ function ScenariosPage() {
                   Add test cases
                 </Button>
               </div>
-              <div className="divide-y divide-line/70 text-[12px]">
+              <div className="divide-y divide-border text-[12px]">
                 {members.map((m, i) => (
                   <div key={m.testCaseId} className="flex items-center gap-3 px-4 py-2.5">
                     <span className="grid size-6 shrink-0 place-items-center rounded-full bg-muted font-mono text-[10px]">
@@ -154,7 +154,7 @@ function ScenariosPage() {
                 }}
                 className={cn(
                   "flex w-full items-center justify-between rounded-md px-2.5 py-2 text-left text-[12px] ring-1",
-                  inScenario ? "bg-accent/10 ring-accent/30" : "bg-white/70 ring-line",
+                  inScenario ? "bg-accent/10 ring-accent/30" : "bg-card ring-line",
                 )}
               >
                 <span className="truncate">{c.name}</span>

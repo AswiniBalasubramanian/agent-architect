@@ -38,7 +38,7 @@ export const Route = createFileRoute("/defects")({
 
 function DefectsPage() {
   const store = useStore();
-  const now = Date.now();
+  const now = new Date("2026-09-07T14:32:00Z").getTime();
   const [status, setStatus] = useState("All");
   const [severity, setSeverity] = useState("All");
   const [selected, setSelected] = useState<string | null>(store.defects[0]?.id ?? null);
@@ -89,15 +89,15 @@ function DefectsPage() {
       </Panel>
 
       <div className="grid grid-cols-12 gap-3">
-        <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-7">
-          <div className="grid grid-cols-[minmax(0,2fr)_70px_100px_minmax(0,1fr)_110px] gap-2 border-b border-line px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
+        <Panel className="col-span-12 overflow-x-auto p-0 lg:col-span-7">
+          <div className="grid grid-cols-[minmax(0,2fr)_70px_100px_minmax(0,1fr)_110px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
             <span>DEFECT</span>
             <span>SEV</span>
             <span>STATUS</span>
             <span>ASSIGNEE</span>
             <span className="text-right">SLA</span>
           </div>
-          <div className="divide-y divide-line/70 text-[12px]">
+          <div className="divide-y divide-border text-[12px]">
             {rows.map((d) => {
               const s = slaState(d, store.slaRules, now);
               return (
@@ -105,8 +105,8 @@ function DefectsPage() {
                   key={d.id}
                   onClick={() => setSelected(d.id)}
                   className={cn(
-                    "grid w-full grid-cols-[minmax(0,2fr)_70px_100px_minmax(0,1fr)_110px] items-center gap-2 px-4 py-2.5 text-left hover:bg-white/70",
-                    selected === d.id && "bg-white/80",
+                    "grid w-full grid-cols-[minmax(0,2fr)_70px_100px_minmax(0,1fr)_110px] items-center gap-2 px-4 py-2.5 text-left hover:bg-muted/70",
+                    selected === d.id && "bg-muted",
                   )}
                 >
                   <div className="min-w-0">
@@ -135,13 +135,13 @@ function DefectsPage() {
         <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-5">
           {active && sla ? (
             <div>
-              <div className="border-b border-line px-4 py-3">
+              <div className="border-b border-border px-4 py-3">
                 <Caps>Defect · {active.key}</Caps>
                 <div className="font-display text-[15px] leading-tight font-semibold">{active.title}</div>
                 <p className="mt-1 text-[11.5px] text-muted-foreground">{active.description}</p>
               </div>
 
-              <div className="border-b border-line px-4 py-3">
+              <div className="border-b border-border px-4 py-3">
                 <div className="flex items-baseline justify-between">
                   <Caps>SLA · {sla.rule?.name ?? "No rule"}</Caps>
                   <span
@@ -172,7 +172,7 @@ function DefectsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3 border-b border-line px-4 py-3 text-[11px]">
+              <div className="grid grid-cols-3 gap-3 border-b border-border px-4 py-3 text-[11px]">
                 <div>
                   <Caps>Status</Caps>
                   <Select
@@ -213,7 +213,7 @@ function DefectsPage() {
                 </div>
               </div>
 
-              <div className="border-b border-line px-4 py-3 text-[12px]">
+              <div className="border-b border-border px-4 py-3 text-[12px]">
                 <Caps className="mb-2">Origin</Caps>
                 {active.runId ? (
                   <Link to="/runs/$runId" params={{ runId: active.runId }} className="underline">
@@ -235,7 +235,7 @@ function DefectsPage() {
                 <Caps className="mb-2">Comments</Caps>
                 <div className="space-y-2 text-[12px]">
                   {active.comments.map((c) => (
-                    <div key={c.id} className="rounded-md bg-white/70 p-2.5 ring-1 ring-line">
+                    <div key={c.id} className="rounded-md bg-card p-2.5 border border-border">
                       <div className="font-mono text-[10px] text-muted-foreground">
                         {userName(c.author)} · {c.on.slice(0, 16).replace("T", " ")}
                       </div>

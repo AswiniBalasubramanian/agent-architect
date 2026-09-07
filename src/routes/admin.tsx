@@ -44,7 +44,7 @@ function AdminPage() {
             onClick={() => setTab(t)}
             className={cn(
               "rounded-md px-3 py-1.5 text-[12px]",
-              tab === t ? "bg-ink text-paper" : "bg-white/70 text-muted-foreground ring-1 ring-line hover:bg-white",
+              tab === t ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground border border-border hover:bg-muted",
             )}
           >
             {t}
@@ -53,8 +53,8 @@ function AdminPage() {
       </div>
 
       {tab === "Configuration values" ? (
-        <Panel className="overflow-hidden p-0">
-          <div className="flex flex-wrap items-end gap-3 border-b border-line px-4 py-3">
+        <Panel className="overflow-x-auto p-0">
+          <div className="flex flex-wrap items-end gap-3 border-b border-border px-4 py-3">
             <div>
               <Caps>Group</Caps>
               <Select className="mt-1 w-56" value={group} onChange={(e) => setGroup(e.target.value)}>
@@ -82,7 +82,7 @@ function AdminPage() {
               Add
             </Button>
           </div>
-          <div className="divide-y divide-line/70 text-[12px]">
+          <div className="divide-y divide-border text-[12px]">
             {store.config
               .filter((c) => c.group === group)
               .map((c) => (
@@ -104,15 +104,15 @@ function AdminPage() {
       ) : null}
 
       {tab === "Custom fields" ? (
-        <Panel className="overflow-hidden p-0">
-          <div className="grid grid-cols-[minmax(0,1.5fr)_110px_110px_90px_100px] gap-2 border-b border-line px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
+        <Panel className="overflow-x-auto p-0">
+          <div className="grid grid-cols-[minmax(0,1.5fr)_110px_110px_90px_100px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
             <span>FIELD</span>
             <span>ENTITY</span>
             <span>TYPE</span>
             <span>REQUIRED</span>
             <span className="text-right">STATE</span>
           </div>
-          <div className="divide-y divide-line/70 text-[12px]">
+          <div className="divide-y divide-border text-[12px]">
             {store.customFields.map((f) => (
               <div key={f.id} className="grid grid-cols-[minmax(0,1.5fr)_110px_110px_90px_100px] items-center gap-2 px-4 py-2.5">
                 <span className="font-medium">{f.label}</span>
@@ -135,15 +135,15 @@ function AdminPage() {
       ) : null}
 
       {tab === "SLA rules" ? (
-        <Panel className="overflow-hidden p-0">
-          <div className="grid grid-cols-[minmax(0,1.5fr)_90px_120px_130px_100px] gap-2 border-b border-line px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
+        <Panel className="overflow-x-auto p-0">
+          <div className="grid grid-cols-[minmax(0,1.5fr)_90px_120px_130px_100px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
             <span>RULE</span>
             <span>APPLIES TO</span>
             <span>RESPONSE</span>
             <span>RESOLUTION</span>
             <span className="text-right">STATE</span>
           </div>
-          <div className="divide-y divide-line/70 text-[12px]">
+          <div className="divide-y divide-border text-[12px]">
             {store.slaRules.map((r) => (
               <div key={r.id} className="grid grid-cols-[minmax(0,1.5fr)_90px_120px_130px_100px] items-center gap-2 px-4 py-2.5">
                 <span className="font-medium">{r.name}</span>
@@ -166,8 +166,8 @@ function AdminPage() {
       ) : null}
 
       {tab === "Notifications" ? (
-        <Panel className="overflow-hidden p-0">
-          <div className="divide-y divide-line/70 text-[12px]">
+        <Panel className="overflow-x-auto p-0">
+          <div className="divide-y divide-border text-[12px]">
             {store.notificationRules.map((n) => (
               <div key={n.id} className="flex items-center justify-between gap-3 px-4 py-3">
                 <div>
@@ -192,14 +192,14 @@ function AdminPage() {
       ) : null}
 
       {tab === "Users & roles" ? (
-        <Panel className="overflow-hidden p-0">
-          <div className="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1.5fr)_130px_100px] gap-2 border-b border-line px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
+        <Panel className="overflow-x-auto p-0">
+          <div className="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1.5fr)_130px_100px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
             <span>NAME</span>
             <span>INITIALS</span>
             <span>ROLE</span>
             <span className="text-right">RUNS</span>
           </div>
-          <div className="divide-y divide-line/70 text-[12px]">
+          <div className="divide-y divide-border text-[12px]">
             {users.map((u) => (
               <div key={u.id} className="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1.5fr)_130px_100px] items-center gap-2 px-4 py-2.5">
                 <span className="font-medium">{userName(u.id)}</span>

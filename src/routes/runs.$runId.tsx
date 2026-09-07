@@ -90,13 +90,13 @@ function RunDetail() {
 
       <div className="grid grid-cols-12 gap-3">
         <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-8">
-          <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
+          <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
             <Caps>Execution steps</Caps>
             <span className="font-mono text-[10px] text-muted-foreground">
               {done}/{run.steps.length} executed
             </span>
           </div>
-          <div className="divide-y divide-line/70">
+          <div className="divide-y divide-border">
             {run.steps.map((s) => (
               <div key={s.id} className="px-4 py-3">
                 <div className="flex items-start gap-3">
@@ -125,8 +125,8 @@ function RunDetail() {
                         className={cn(
                           "rounded-md px-2 py-1 font-mono text-[10px] ring-1 transition-colors",
                           s.status === st
-                            ? "bg-ink text-paper ring-transparent"
-                            : "bg-white/70 text-muted-foreground ring-line hover:bg-white",
+                            ? "bg-primary text-primary-foreground ring-transparent"
+                            : "bg-card text-muted-foreground ring-line hover:bg-muted",
                         )}
                       >
                         {st}
@@ -173,7 +173,7 @@ function RunDetail() {
             <Caps className="mb-2">Linked defects · {defects.length}</Caps>
             <div className="space-y-2 text-[12px]">
               {defects.map((d) => (
-                <Link key={d.id} to="/defects" className="block rounded-md bg-white/70 p-2.5 ring-1 ring-line hover:bg-white">
+                <Link key={d.id} to="/defects" className="block rounded-md bg-card p-2.5 border border-border hover:bg-muted">
                   <div className="truncate font-medium">{d.title}</div>
                   <div className="font-mono text-[10px] text-muted-foreground">
                     {d.key} · {d.severity} · {d.status}

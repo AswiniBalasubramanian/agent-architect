@@ -2,10 +2,7 @@
 @source "../src";
 @import "tw-animate-css";
 
-/*
- * KTern.AI Test Management — "Flight deck glass" design system.
- * All colors are oklch tokens. Never hardcode colors in components.
- */
+/* KTern.AI Test Management — shadcn-inspired neutral design system. */
 
 @theme inline {
   --font-sans: var(--font-body);
@@ -51,39 +48,39 @@
 }
 
 :root {
-  --radius: 0.5rem;
+  --radius: 0.625rem;
 
   --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-heading: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-code: "JetBrains Mono", ui-monospace, monospace;
 
-  --paper: oklch(0.9598 0.0091 258.34);
-  --ink: oklch(0.1831 0.0309 263.38);
-  --line: oklch(0.8889 0.0186 258.36);
-  --panel: oklch(1 0 0 / 60%);
+  --paper: oklch(0.985 0.002 247.84);
+  --ink: oklch(0.145 0.01 247.84);
+  --line: oklch(0.922 0.006 247.84);
+  --panel: oklch(1 0 0);
 
-  --background: oklch(0.9598 0.0091 258.34);
-  --foreground: oklch(0.1831 0.0309 263.38);
-  --card: oklch(1 0 0 / 60%);
-  --card-foreground: oklch(0.1831 0.0309 263.38);
-  --popover: oklch(0.995 0.003 258);
-  --popover-foreground: oklch(0.1831 0.0309 263.38);
+  --background: oklch(0.985 0.002 247.84);
+  --foreground: oklch(0.145 0.01 247.84);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0.01 247.84);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0.01 247.84);
 
-  --primary: oklch(0.1831 0.0309 263.38);
-  --primary-foreground: oklch(0.9598 0.0091 258.34);
-  --secondary: oklch(1 0 0 / 70%);
-  --secondary-foreground: oklch(0.1831 0.0309 263.38);
+  --primary: oklch(0.205 0.012 247.84);
+  --primary-foreground: oklch(0.985 0.002 247.84);
+  --secondary: oklch(0.967 0.004 247.84);
+  --secondary-foreground: oklch(0.205 0.012 247.84);
 
-  --muted: oklch(0.9339 0.0121 258);
-  --muted-foreground: oklch(0.5241 0.0408 258.84);
-  --accent: oklch(0.6002 0.1038 184.7);
-  --accent-foreground: oklch(0.99 0.005 184);
+  --muted: oklch(0.967 0.004 247.84);
+  --muted-foreground: oklch(0.48 0.018 247.84);
+  --accent: oklch(0.57 0.17 255.5);
+  --accent-foreground: oklch(0.985 0.002 247.84);
   --destructive: oklch(0.5771 0.2152 27.33);
   --destructive-foreground: oklch(0.99 0.005 27);
 
-  --border: oklch(0.8889 0.0186 258.36);
-  --input: oklch(0.8889 0.0186 258.36);
-  --ring: oklch(0.6002 0.1038 184.7);
+  --border: oklch(0.922 0.006 247.84);
+  --input: oklch(0.922 0.006 247.84);
+  --ring: oklch(0.57 0.17 255.5);
 
   --pass: oklch(0.6271 0.1699 149.21);
   --fail: oklch(0.5771 0.2152 27.33);
@@ -91,6 +88,27 @@
   --run: oklch(0.5461 0.2152 262.88);
   --pending: oklch(0.7107 0.0351 256.79);
   --warn: oklch(0.5534 0.1739 38.4);
+}
+
+.dark {
+  --paper: oklch(0.145 0.01 247.84);
+  --ink: oklch(0.985 0.002 247.84);
+  --line: oklch(0.27 0.012 247.84);
+  --panel: oklch(0.205 0.012 247.84);
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--panel);
+  --card-foreground: var(--ink);
+  --popover: oklch(0.205 0.012 247.84);
+  --popover-foreground: var(--ink);
+  --primary: oklch(0.922 0.006 247.84);
+  --primary-foreground: oklch(0.205 0.012 247.84);
+  --secondary: oklch(0.27 0.012 247.84);
+  --secondary-foreground: var(--ink);
+  --muted: oklch(0.27 0.012 247.84);
+  --muted-foreground: oklch(0.71 0.018 247.84);
+  --border: oklch(0.27 0.012 247.84);
+  --input: oklch(0.27 0.012 247.84);
 }
 
 @layer base {
@@ -105,6 +123,15 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    transition-property: color, background-color, border-color, box-shadow, opacity;
+    transition-duration: 150ms;
+  }
+
   h1,
   h2,
   h3 {
@@ -112,24 +139,22 @@
   }
 }
 
-/* Frosted panel surface used across every console view. */
 @utility panel {
-  background-color: color-mix(in oklab, white 60%, transparent);
-  backdrop-filter: blur(16px);
-  box-shadow: inset 0 0 0 1px var(--color-line);
-  border-radius: var(--radius-xl);
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1px 2px 0 color-mix(in oklab, var(--color-ink) 4%, transparent);
+  border-radius: var(--radius-lg);
 }
 
 @utility panel-flush {
-  background-color: color-mix(in oklab, white 60%, transparent);
-  backdrop-filter: blur(16px);
-  box-shadow: inset 0 0 0 1px var(--color-line);
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
 }
 
 @utility label-caps {
   font-family: var(--font-code);
   font-size: 10px;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-muted-foreground);
 }
