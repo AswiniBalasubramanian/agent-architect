@@ -238,7 +238,7 @@ function ProcessesPage() {
 
       {view === "grid" ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {rows.map(({ node, depth, wbs }) => {
+          {visibleRows.map(({ node, depth, wbs }) => {
             const kids = childrenOf.get(node.id) ?? [];
             const cov = coverage(node.id);
             const parent = node.parentId ? store.processes.find((process) => process.id === node.parentId) : null;
