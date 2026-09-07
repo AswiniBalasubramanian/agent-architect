@@ -55,7 +55,7 @@ export function AiAssist<T>({
           </Caps>
           <p className="mt-1 text-[12px] text-muted-foreground">{hint}</p>
         </div>
-        <Button variant="secondary" onClick={run} disabled={busy || !!disabled}>
+        <Button variant="ghost" className="border border-border" onClick={run} disabled={busy || !!disabled}>
           {busy ? <Spinner /> : <Sparkles className="size-3.5" />}
           {busy ? "Working…" : cta}
         </Button>
