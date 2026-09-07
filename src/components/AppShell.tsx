@@ -11,6 +11,8 @@ import {
   FileCheck2,
   FolderKanban,
   LayoutDashboard,
+  Lightbulb,
+  LineChart,
   Menu,
   Network,
   Search,
@@ -58,10 +60,18 @@ const navGroups: { heading: string; items: NavItem[] }[] = [
   },
   {
     heading: "Quality",
+    items: [{ to: "/defects", label: "Defects", icon: Bug }],
+  },
+  {
+    heading: "Reporting",
     items: [
-      { to: "/defects", label: "Defects", icon: Bug },
-      { to: "/admin", label: "Administration", icon: Settings2 },
+      { to: "/insights", label: "Insights", icon: Lightbulb },
+      { to: "/reports", label: "Reports", icon: LineChart },
     ],
+  },
+  {
+    heading: "Administration",
+    items: [{ to: "/admin", label: "Administration", icon: Settings2 }],
   },
 ];
 
