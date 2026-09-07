@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { Button, Caps, PageHeader, Panel, Select, TextInput } from "@/components/ui-kit";
-import { useStore, userName, users } from "@/store/app-store";
+import { Button, Caps, NoAccess, PageHeader, Panel, Select, Spinner, TextInput } from "@/components/ui-kit";
+import { organizations, projects, useStore, userName, users } from "@/store/app-store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin")({
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-const TABS = ["Configuration values", "Custom fields", "SLA rules", "Notifications", "Users & roles"] as const;
+const TABS = ["Configuration values", "Custom fields", "SLA rules", "Notifications", "Integrations", "Users & roles"] as const;
 
 function AdminPage() {
   const store = useStore();
@@ -29,9 +29,20 @@ function AdminPage() {
   const [newValue, setNewValue] = useState("");
 
   const groups = [...new Set(store.config.map((c) => c.group))];
+  const project = projects.find((p) => p.id === store.activeProjectId)!;
+  const org = organizations.find((o) => o.id === project.orgId)!;
+
+  if (!store.can("administer")) {
+    return (
+      <AppShell breadcrumbs={[org.name, "Administration"]}>
+        <PageHeader title="Admin Console" subtitle="Organization-level configuration." />
+        <NoAccess what="Only the Admin persona can change configuration values, custom fields, SLA rules, notifications and integrations. Switch persona in the top bar to continue." />
+      </AppShell>
+    );
+  }
 
   return (
-    <AppShell breadcrumbs={["Admin", "Nortaxis Systems", tab]}>
+    <AppShell breadcrumbs={[org.name, "Administration", tab]}>
       <PageHeader
         title="Admin Console"
         subtitle="Organization-level configuration. Changes apply immediately to every project in this organization."
@@ -187,6 +198,70 @@ function AdminPage() {
                 </button>
               </div>
             ))}
+          </div>
+        </Panel>
+      ) : null}
+
+      {tab === "Integrations" ? (
+        <Panel className="overflow-x-auto p-0">
+          <div className="grid grid-cols-[minmax(0,1.6fr)_minmax(0,1.6fr)_130px_150px_180px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
+            <span>SOURCE</span>
+            <span>SCOPE</span>
+            <span>DIRECTION</span>
+            <span>STATE</span>
+            <span className="text-right">ACTIONS</span>
+          </div>
+          <div className="divide-y divide-border text-[12px]">
+            {store.integrations.map((integration) => {
+              const syncing = store.syncingIntegrationId === integration.id;
+              const connected = integration.status === "Connected";
+              return (
+                <div
+                  key={integration.id}
+                  className="grid grid-cols-[minmax(0,1.6fr)_minmax(0,1.6fr)_130px_150px_180px] items-center gap-2 px-4 py-3"
+                >
+                  <div className="min-w-0">
+                    <div className="truncate font-medium">
+                      {integration.name} <span className="text-muted-foreground">· {integration.vendor}</span>
+                    </div>
+                    <div className="truncate font-mono text-[10px] text-muted-foreground">
+                      {integration.entities.join(" · ")}
+                    </div>
+                  </div>
+                  <div className="text-[11.5px] text-muted-foreground">{integration.purpose}</div>
+                  <span className="font-mono text-[10px] text-muted-foreground">{integration.direction}</span>
+                  <div>
+                    <span
+                      className={cn(
+                        "inline-flex items-center gap-1.5 rounded-md border border-current/15 px-2 py-0.5 text-[10px] font-medium",
+                        integration.status === "Connected"
+                          ? "bg-pass/12 text-pass"
+                          : integration.status === "Error"
+                            ? "bg-fail/12 text-fail"
+                            : "bg-pending/20 text-muted-foreground",
+                      )}
+                    >
+                      {syncing ? <Spinner /> : <i className="size-1.5 rounded-full bg-current" />}
+                      {syncing ? "Syncing…" : integration.status}
+                    </span>
+                    <div className="mt-1 font-mono text-[10px] text-muted-foreground">
+                      {integration.lastSync
+                        ? `${integration.recordCount ?? 0} records · ${integration.lastSync.slice(0, 16).replace("T", " ")}`
+                        : "never synced"}
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button variant="ghost" className="border border-border" onClick={() => store.toggleIntegration(integration.id)}>
+                      {connected ? "Disconnect" : "Connect"}
+                    </Button>
+                    <Button disabled={syncing || !connected} onClick={() => void store.syncIntegration(integration.id)}>
+                      {syncing ? <Spinner /> : null}
+                      {syncing ? "Syncing" : "Sync now"}
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </Panel>
       ) : null}
