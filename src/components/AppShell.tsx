@@ -113,7 +113,7 @@ export function AppShell({
                 collapsed && !mobile ? "justify-center p-1.5" : "gap-2.5 px-2.5 py-2",
               )}
             >
-              <div className="grid size-7 shrink-0 place-items-center rounded-md bg-accent/10 text-xs font-semibold text-accent">
+              <div className="grid size-7 shrink-0 place-items-center rounded-md bg-muted text-xs font-semibold text-foreground">
                 {org.name[0]}
               </div>
               {collapsed && !mobile ? null : (
