@@ -10,33 +10,115 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlansRouteImport } from './routes/plans'
+import { Route as ProcessesRouteImport } from './routes/processes'
+import { Route as RequirementsRouteImport } from './routes/requirements'
+import { Route as ScenariosRouteImport } from './routes/scenarios'
+import { Route as TestCasesRouteImport } from './routes/test-cases'
+import { Route as RunsIndexRouteImport } from './routes/runs.index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlansRoute = PlansRouteImport.update({
+  id: '/plans',
+  path: '/plans',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProcessesRoute = ProcessesRouteImport.update({
+  id: '/processes',
+  path: '/processes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RequirementsRoute = RequirementsRouteImport.update({
+  id: '/requirements',
+  path: '/requirements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScenariosRoute = ScenariosRouteImport.update({
+  id: '/scenarios',
+  path: '/scenarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TestCasesRoute = TestCasesRouteImport.update({
+  id: '/test-cases',
+  path: '/test-cases',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RunsIndexRoute = RunsIndexRouteImport.update({
+  id: '/runs/',
+  path: '/runs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/plans': typeof PlansRoute
+  '/processes': typeof ProcessesRoute
+  '/requirements': typeof RequirementsRoute
+  '/scenarios': typeof ScenariosRoute
+  '/test-cases': typeof TestCasesRoute
+  '/runs/': typeof RunsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/plans': typeof PlansRoute
+  '/processes': typeof ProcessesRoute
+  '/requirements': typeof RequirementsRoute
+  '/scenarios': typeof ScenariosRoute
+  '/test-cases': typeof TestCasesRoute
+  '/runs': typeof RunsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/plans': typeof PlansRoute
+  '/processes': typeof ProcessesRoute
+  '/requirements': typeof RequirementsRoute
+  '/scenarios': typeof ScenariosRoute
+  '/test-cases': typeof TestCasesRoute
+  '/runs/': typeof RunsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/plans'
+    | '/processes'
+    | '/requirements'
+    | '/scenarios'
+    | '/test-cases'
+    | '/runs/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/plans'
+    | '/processes'
+    | '/requirements'
+    | '/scenarios'
+    | '/test-cases'
+    | '/runs'
+  id:
+    | '__root__'
+    | '/'
+    | '/plans'
+    | '/processes'
+    | '/requirements'
+    | '/scenarios'
+    | '/test-cases'
+    | '/runs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PlansRoute: typeof PlansRoute
+  ProcessesRoute: typeof ProcessesRoute
+  RequirementsRoute: typeof RequirementsRoute
+  ScenariosRoute: typeof ScenariosRoute
+  TestCasesRoute: typeof TestCasesRoute
+  RunsIndexRoute: typeof RunsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +130,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/plans': {
+      id: '/plans'
+      path: '/plans'
+      fullPath: '/plans'
+      preLoaderRoute: typeof PlansRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/processes': {
+      id: '/processes'
+      path: '/processes'
+      fullPath: '/processes'
+      preLoaderRoute: typeof ProcessesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/requirements': {
+      id: '/requirements'
+      path: '/requirements'
+      fullPath: '/requirements'
+      preLoaderRoute: typeof RequirementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scenarios': {
+      id: '/scenarios'
+      path: '/scenarios'
+      fullPath: '/scenarios'
+      preLoaderRoute: typeof ScenariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/test-cases': {
+      id: '/test-cases'
+      path: '/test-cases'
+      fullPath: '/test-cases'
+      preLoaderRoute: typeof TestCasesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/runs/': {
+      id: '/runs/'
+      path: '/runs'
+      fullPath: '/runs/'
+      preLoaderRoute: typeof RunsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PlansRoute: PlansRoute,
+  ProcessesRoute: ProcessesRoute,
+  RequirementsRoute: RequirementsRoute,
+  ScenariosRoute: ScenariosRoute,
+  TestCasesRoute: TestCasesRoute,
+  RunsIndexRoute: RunsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
