@@ -128,7 +128,7 @@ export function AppShell({
             </div>
             <div className="ml-auto flex items-center gap-2">
               <div className="hidden w-52 items-center gap-2 rounded-md bg-white/70 px-2.5 py-1.5 text-[12px] text-muted-foreground ring-1 ring-line md:flex">
-                <span className="text-[10px]">⌕</span> {project.key ?? "Search runs, cases, owners…"}
+                <span className="text-[10px]">⌕</span> Search runs, cases, owners…
               </div>
               <div className="grid size-8 place-items-center rounded-md bg-accent/15 font-display text-xs font-semibold text-accent">
                 {currentUser.initials}
