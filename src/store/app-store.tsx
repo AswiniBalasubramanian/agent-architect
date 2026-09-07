@@ -101,6 +101,9 @@ interface Actions {
   addTestCase: (input: { name: string; folderId: ID; testingType: string; priority: TestCase["priority"]; description: string }) => void;
   saveTestCaseVersion: (id: ID, steps: TestCase["versions"][number]["steps"], changeNote: string) => void;
   updateTestCase: (id: ID, patch: Partial<TestCase>) => void;
+  cloneTestCase: (id: ID) => void;
+  moveCasesToFolder: (ids: ID[], folderId: ID) => void;
+  addScenarioToPlan: (planId: ID, scenarioId: ID) => void;
   addScenario: (input: { name: string; description: string }) => void;
   setScenarioMembers: (id: ID, memberIds: ID[]) => void;
   addPlan: (input: Omit<TestPlan, "id" | "key" | "projectId">) => void;
