@@ -24,16 +24,33 @@ import { currentUser, organizations, projects, useStore } from "@/store/app-stor
 import { slaState } from "@/lib/sla";
 import { cn } from "@/lib/utils";
 
-const nav: { to: string; label: string; icon: LucideIcon }[] = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/processes", label: "Business Processes", icon: Network },
-  { to: "/requirements", label: "Requirements", icon: FileCheck2 },
-  { to: "/test-cases", label: "Test Cases", icon: CheckSquare2 },
-  { to: "/scenarios", label: "Scenarios", icon: FolderKanban },
-  { to: "/plans", label: "Test Plans", icon: ClipboardCheck },
-  { to: "/runs", label: "Test Runs", icon: TestTube2 },
-  { to: "/defects", label: "Defects", icon: Bug },
-  { to: "/admin", label: "Administration", icon: Settings2 },
+type NavItem = { to: string; label: string; icon: LucideIcon };
+
+const navGroups: { heading: string; items: NavItem[] }[] = [
+  {
+    heading: "Overview",
+    items: [
+      { to: "/", label: "Dashboard", icon: LayoutDashboard },
+      { to: "/processes", label: "Business Processes", icon: Network },
+      { to: "/requirements", label: "Requirements", icon: FileCheck2 },
+    ],
+  },
+  {
+    heading: "Execution",
+    items: [
+      { to: "/test-cases", label: "Test Cases", icon: CheckSquare2 },
+      { to: "/scenarios", label: "Scenarios", icon: FolderKanban },
+      { to: "/plans", label: "Test Plans", icon: ClipboardCheck },
+      { to: "/runs", label: "Test Runs", icon: TestTube2 },
+    ],
+  },
+  {
+    heading: "Quality",
+    items: [
+      { to: "/defects", label: "Defects", icon: Bug },
+      { to: "/admin", label: "Administration", icon: Settings2 },
+    ],
+  },
 ];
 
 export function AppShell({
