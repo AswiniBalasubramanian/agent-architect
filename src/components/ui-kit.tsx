@@ -152,7 +152,7 @@ export function Button({
   variant?: "primary" | "ghost" | "danger";
   type?: "button" | "submit";
   className?: string;
-  disabled: boolean;
+  disabled?: boolean;
 }) {
   const styles = {
     primary: "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
