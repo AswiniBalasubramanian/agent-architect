@@ -45,6 +45,8 @@ function TestCasesPage() {
   const [selected, setSelected] = useState<string | null>(store.cases[0]?.id ?? null);
   const [viewVersion, setViewVersion] = useState<number | null>(null);
   const [creating, setCreating] = useState(false);
+  const [checked, setChecked] = useState<string[]>([]);
+  const [moveTo, setMoveTo] = useState("f2");
   const [importing, setImporting] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<TestStep[]>([]);
