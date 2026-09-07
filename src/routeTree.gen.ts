@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProcessesRouteImport } from './routes/processes'
+import { Route as RequirementsRouteImport } from './routes/requirements'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +23,40 @@ const ProcessesRoute = ProcessesRouteImport.update({
   path: '/processes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RequirementsRoute = RequirementsRouteImport.update({
+  id: '/requirements',
+  path: '/requirements',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/processes': typeof ProcessesRoute
+  '/requirements': typeof RequirementsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/processes': typeof ProcessesRoute
+  '/requirements': typeof RequirementsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/processes': typeof ProcessesRoute
+  '/requirements': typeof RequirementsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/processes'
+  fullPaths: '/' | '/processes' | '/requirements'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/processes'
-  id: '__root__' | '/' | '/processes'
+  to: '/' | '/processes' | '/requirements'
+  id: '__root__' | '/' | '/processes' | '/requirements'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProcessesRoute: typeof ProcessesRoute
+  RequirementsRoute: typeof RequirementsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +75,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProcessesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/requirements': {
+      id: '/requirements'
+      path: '/requirements'
+      fullPath: '/requirements'
+      preLoaderRoute: typeof RequirementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProcessesRoute: ProcessesRoute,
+  RequirementsRoute: RequirementsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
