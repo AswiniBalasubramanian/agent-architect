@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { ChevronDown, ChevronRight, Grid3X3, ListTree } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button, Caps, Field, Modal, PageHeader, Panel, Select, TextInput } from "@/components/ui-kit";
 import { useStore, userName, users } from "@/store/app-store";
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/processes")({
 
 function ProcessesPage() {
   const store = useStore();
-  const [view, setView] = useState<"tree" | "grid">("tree");
+  const [view, setView] = useState<"tree" | "grid">("grid");
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [selected, setSelected] = useState<string | null>(null);
   const [creating, setCreating] = useState<{ parentId: string | null } | null>(null);
@@ -62,12 +63,12 @@ function ProcessesPage() {
       (childrenOf.get(parentId) ?? []).forEach((node, i) => {
         const wbs = prefix ? `${prefix}.${i + 1}` : `${i + 1}`;
         out.push({ node, depth, wbs });
-        if (!collapsed.has(node.id)) walk(node.id, depth + 1, wbs);
+        if (view === "grid" || !collapsed.has(node.id)) walk(node.id, depth + 1, wbs);
       });
     };
     walk(null, 0, "");
     return out;
-  }, [childrenOf, collapsed]);
+  }, [childrenOf, collapsed, view]);
 
   const levelTypes = store.config.filter((c) => c.group === "Level Type" && c.active);
   const applications = store.config.filter((c) => c.group === "Application" && c.active);
@@ -86,19 +87,23 @@ function ProcessesPage() {
         subtitle={`${store.processes.length} nodes · organization-level master content · reusable across every project`}
         actions={
           <>
-            <div className="flex rounded-md bg-card p-0.5 border border-border">
-              {(["tree", "grid"] as const).map((v) => (
-                <button
-                  key={v}
-                  onClick={() => setView(v)}
-                  className={cn(
-                    "rounded px-2.5 py-1 font-mono text-[11px] capitalize",
-                    view === v ? "bg-primary text-primary-foreground" : "text-muted-foreground",
-                  )}
-                >
-                  {v} view
-                </button>
-              ))}
+            <div className="flex rounded-md border border-border bg-card p-0.5" aria-label="Process view">
+              <Button
+                variant={view === "grid" ? "primary" : "ghost"}
+                onClick={() => setView("grid")}
+                className="gap-1.5 border-0 shadow-none"
+              >
+                <Grid3X3 className="size-3.5" />
+                Grid
+              </Button>
+              <Button
+                variant={view === "tree" ? "primary" : "ghost"}
+                onClick={() => setView("tree")}
+                className="gap-1.5 border-0 shadow-none"
+              >
+                <ListTree className="size-3.5" />
+                Tree
+              </Button>
             </div>
             <Button onClick={() => setCreating({ parentId: selected })}>
               {selected ? "Add child node" : "Add root node"}
@@ -107,65 +112,90 @@ function ProcessesPage() {
         }
       />
 
-      <Panel className="overflow-x-auto p-0">
-        <div className="grid grid-cols-[80px_minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_120px_80px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
-          <span>WBS</span>
-          <span>NAME</span>
-          <span>LEVEL TYPE</span>
-          <span>APPLICATION</span>
-          <span>OWNER</span>
-          <span>COVERAGE</span>
-          <span className="text-right">SOURCE</span>
-        </div>
-        <div className="divide-y divide-border text-[12px]">
+      {view === "grid" ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {rows.map(({ node, depth, wbs }) => {
             const kids = childrenOf.get(node.id) ?? [];
             const cov = coverage(node.id);
+            const parent = node.parentId ? store.processes.find((process) => process.id === node.parentId) : null;
             return (
-              <div
+              <button
                 key={node.id}
+                type="button"
                 onClick={() => setSelected(node.id === selected ? null : node.id)}
                 className={cn(
-                  "grid cursor-pointer grid-cols-[80px_minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_120px_80px] items-center gap-2 px-4 py-2 hover:bg-muted/70",
-                  selected === node.id && "bg-muted",
+                  "group min-h-44 rounded-lg border bg-card p-4 text-left shadow-sm transition-colors hover:border-ring hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  selected === node.id ? "border-ring ring-2 ring-ring/20" : "border-border",
                 )}
               >
-                <span className="font-mono text-[10px] text-muted-foreground">{wbs}</span>
-                <div
-                  className="flex min-w-0 items-center gap-1.5"
-                  style={{ paddingLeft: view === "tree" ? depth * 16 : 0 }}
-                >
-                  {kids.length ? (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setCollapsed((prev) => {
-                          const next = new Set(prev);
-                          next.has(node.id) ? next.delete(node.id) : next.add(node.id);
-                          return next;
-                        });
-                      }}
-                      className="font-mono text-[10px] text-muted-foreground"
-                    >
-                      {collapsed.has(node.id) ? "▸" : "▾"}
-                    </button>
-                  ) : (
-                    <span className="w-2.5" />
-                  )}
-                  <span className="truncate font-medium">{node.name}</span>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="font-mono text-[10px] text-muted-foreground">WBS {wbs}</div>
+                    <h2 className="mt-2 line-clamp-2 text-sm font-semibold text-foreground">{node.name}</h2>
+                  </div>
+                  <span className="shrink-0 rounded-md border border-border bg-muted px-2 py-1 font-mono text-[9px] text-muted-foreground">
+                    L{depth + 1}
+                  </span>
                 </div>
-                <span className="truncate text-muted-foreground">{node.levelType}</span>
-                <span className="truncate font-mono text-[10px] text-muted-foreground">{node.application}</span>
-                <span className="truncate text-muted-foreground">{userName(node.owner)}</span>
-                <span className="font-mono text-[10px] text-muted-foreground">
-                  {cov.cases} cases · {cov.passed} pass
-                </span>
-                <span className="text-right font-mono text-[10px] text-muted-foreground">{node.sourceType}</span>
-              </div>
+                <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-[11px]">
+                  <div>
+                    <Caps>Level type</Caps>
+                    <div className="mt-1 truncate text-foreground">{node.levelType}</div>
+                  </div>
+                  <div>
+                    <Caps>Application</Caps>
+                    <div className="mt-1 truncate font-mono text-[10px] text-foreground">{node.application}</div>
+                  </div>
+                  <div>
+                    <Caps>Owner</Caps>
+                    <div className="mt-1 truncate text-foreground">{userName(node.owner)}</div>
+                  </div>
+                  <div>
+                    <Caps>Coverage</Caps>
+                    <div className="mt-1 font-mono text-[10px] text-foreground">{cov.cases} cases · {cov.passed} pass</div>
+                  </div>
+                </div>
+                <div className="mt-4 flex items-center justify-between border-t border-border pt-3 font-mono text-[9px] text-muted-foreground">
+                  <span className="truncate pr-3">{parent ? `Under ${parent.name}` : "Root process"}</span>
+                  <span className="shrink-0">{kids.length} children · {node.sourceType}</span>
+                </div>
+              </button>
             );
           })}
         </div>
-      </Panel>
+      ) : (
+        <Panel className="overflow-x-auto p-0">
+          <div className="grid min-w-[900px] grid-cols-[80px_minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_120px_80px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
+            <span>WBS</span><span>NAME</span><span>LEVEL TYPE</span><span>APPLICATION</span><span>OWNER</span><span>COVERAGE</span><span className="text-right">SOURCE</span>
+          </div>
+          <div className="min-w-[900px] divide-y divide-border text-[12px]">
+            {rows.map(({ node, depth, wbs }) => {
+              const kids = childrenOf.get(node.id) ?? [];
+              const cov = coverage(node.id);
+              return (
+                <div key={node.id} onClick={() => setSelected(node.id === selected ? null : node.id)} className={cn("grid cursor-pointer grid-cols-[80px_minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_120px_80px] items-center gap-2 px-4 py-2 hover:bg-muted/70", selected === node.id && "bg-muted")}>
+                  <span className="font-mono text-[10px] text-muted-foreground">{wbs}</span>
+                  <div className="flex min-w-0 items-center gap-1.5" style={{ paddingLeft: depth * 16 }}>
+                    {kids.length ? (
+                      <span onClick={(event) => event.stopPropagation()}>
+                        <Button variant="ghost" className="size-6 min-h-6 shrink-0 px-0" onClick={() => { setCollapsed((previous) => { const next = new Set(previous); next.has(node.id) ? next.delete(node.id) : next.add(node.id); return next; }); }} aria-label={collapsed.has(node.id) ? `Expand ${node.name}` : `Collapse ${node.name}`}>
+                          {collapsed.has(node.id) ? <ChevronRight className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+                        </Button>
+                      </span>
+                    ) : <span className="w-6" />}
+                    <span className="truncate font-medium">{node.name}</span>
+                  </div>
+                  <span className="truncate text-muted-foreground">{node.levelType}</span>
+                  <span className="truncate font-mono text-[10px] text-muted-foreground">{node.application}</span>
+                  <span className="truncate text-muted-foreground">{userName(node.owner)}</span>
+                  <span className="font-mono text-[10px] text-muted-foreground">{cov.cases} cases · {cov.passed} pass</span>
+                  <span className="text-right font-mono text-[10px] text-muted-foreground">{node.sourceType}</span>
+                </div>
+              );
+            })}
+          </div>
+        </Panel>
+      )}
 
       {selected ? (
         <Panel className="flex flex-wrap items-center gap-3 p-4">
