@@ -247,9 +247,14 @@ function TestCasesPage() {
                   <p className="mt-1 text-[11.5px] text-muted-foreground">{active.description}</p>
                 </div>
                 {canEdit ? (
-                  <Button variant="ghost" onClick={startEdit}>
-                    Edit steps
-                  </Button>
+                  <div className="flex shrink-0 gap-1.5">
+                    <Button variant="ghost" onClick={() => store.cloneTestCase(active.id)}>
+                      Clone
+                    </Button>
+                    <Button variant="ghost" onClick={startEdit}>
+                      Edit steps
+                    </Button>
+                  </div>
                 ) : null}
               </div>
 
