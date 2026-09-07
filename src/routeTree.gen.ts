@@ -15,6 +15,7 @@ import { Route as ProcessesRouteImport } from './routes/processes'
 import { Route as RequirementsRouteImport } from './routes/requirements'
 import { Route as ScenariosRouteImport } from './routes/scenarios'
 import { Route as TestCasesRouteImport } from './routes/test-cases'
+import { Route as RunsIndexRouteImport } from './routes/runs.index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const TestCasesRoute = TestCasesRouteImport.update({
   path: '/test-cases',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RunsIndexRoute = RunsIndexRouteImport.update({
+  id: '/runs/',
+  path: '/runs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/requirements': typeof RequirementsRoute
   '/scenarios': typeof ScenariosRoute
   '/test-cases': typeof TestCasesRoute
+  '/runs/': typeof RunsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/requirements': typeof RequirementsRoute
   '/scenarios': typeof ScenariosRoute
   '/test-cases': typeof TestCasesRoute
+  '/runs': typeof RunsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +79,7 @@ export interface FileRoutesById {
   '/requirements': typeof RequirementsRoute
   '/scenarios': typeof ScenariosRoute
   '/test-cases': typeof TestCasesRoute
+  '/runs/': typeof RunsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,6 +90,7 @@ export interface FileRouteTypes {
     | '/requirements'
     | '/scenarios'
     | '/test-cases'
+    | '/runs/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -89,6 +99,7 @@ export interface FileRouteTypes {
     | '/requirements'
     | '/scenarios'
     | '/test-cases'
+    | '/runs'
   id:
     | '__root__'
     | '/'
@@ -97,6 +108,7 @@ export interface FileRouteTypes {
     | '/requirements'
     | '/scenarios'
     | '/test-cases'
+    | '/runs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,6 +118,7 @@ export interface RootRouteChildren {
   RequirementsRoute: typeof RequirementsRoute
   ScenariosRoute: typeof ScenariosRoute
   TestCasesRoute: typeof TestCasesRoute
+  RunsIndexRoute: typeof RunsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -152,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TestCasesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/runs/': {
+      id: '/runs/'
+      path: '/runs'
+      fullPath: '/runs/'
+      preLoaderRoute: typeof RunsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -162,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   RequirementsRoute: RequirementsRoute,
   ScenariosRoute: ScenariosRoute,
   TestCasesRoute: TestCasesRoute,
+  RunsIndexRoute: RunsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
