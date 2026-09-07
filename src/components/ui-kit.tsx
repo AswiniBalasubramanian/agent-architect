@@ -1,5 +1,12 @@
 import { X } from "lucide-react";
-import { type ReactNode } from "react";
+import { Children, isValidElement, type ReactNode } from "react";
+import {
+  Select as ShSelect,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { DefectStatus, Priority, RunStatus, Severity, StepStatus } from "@/data/types";
 import { cn } from "@/lib/utils";
 
@@ -156,7 +163,7 @@ export function Button({
     <button
       type={type}
       onClick={onClick}
-      disabled={disabled}
+      disabled={!!disabled}
       className={cn(
         "inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg px-3.5 py-1.5 text-[13px] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40",
         styles,
@@ -188,8 +195,76 @@ export function TextArea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement
   return <textarea {...props} className={cn(controlClass, "min-h-[72px]", props.className)} />;
 }
 
-export function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
-  return <select {...props} className={cn(controlClass, props.className)} />;
+const EMPTY = "__empty__";
+
+interface FlatOption {
+  value: string;
+  label: ReactNode;
+  disabled: boolean;
+}
+
+function flattenOptions(children: ReactNode, out: FlatOption[] = []): FlatOption[] {
+  Children.forEach(children, (child) => {
+    if (!isValidElement(child)) return;
+    if (child.type === "option") {
+      const p = child.props as { value?: string | number; children?: ReactNode; disabled?: boolean };
+      const label = p.children ?? "";
+      const value = p.value !== undefined ? String(p.value) : String(label);
+      out.push({ value, label, disabled: !!p.disabled });
+    } else {
+      const p = child.props as { children?: ReactNode };
+      if (p?.children) flattenOptions(p.children, out);
+    }
+  });
+  return out;
+}
+
+/** shadcn-styled dropdown that keeps the native <select> prop API. */
+export function Select({
+  value,
+  defaultValue,
+  onChange,
+  children,
+  className,
+  disabled,
+  "aria-label": ariaLabel,
+}: React.SelectHTMLAttributes<HTMLSelectElement>) {
+  const options = flattenOptions(children);
+  const current = value !== undefined ? String(value) : defaultValue !== undefined ? String(defaultValue) : undefined;
+  const placeholder = options.find((o) => o.value === "")?.label;
+
+  return (
+    <ShSelect
+      value={current === undefined || current === "" ? EMPTY : current}
+      disabled={!!disabled}
+      onValueChange={(next) => {
+        const resolved = next === EMPTY ? "" : next;
+        onChange?.({ target: { value: resolved } } as React.ChangeEvent<HTMLSelectElement>);
+      }}
+    >
+      <SelectTrigger
+        aria-label={ariaLabel}
+        className={cn(
+          "h-auto w-full rounded-lg border-input bg-background px-3 py-2 text-[13px] text-foreground shadow-xs data-[placeholder]:text-muted-foreground",
+          className,
+        )}
+      >
+        <SelectValue placeholder={placeholder ?? "Select…"} />
+      </SelectTrigger>
+      <SelectContent className="rounded-lg">
+        {options.map((opt, i) => (
+          <SelectItem
+            key={`${opt.value}-${i}`}
+            value={opt.value === "" ? EMPTY : opt.value}
+            disabled={opt.disabled}
+            className="text-[13px]"
+          >
+            {opt.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </ShSelect>
+  );
 }
 
 export function Modal({
