@@ -3,7 +3,9 @@ import { useMemo, useState } from "react";
 import { ChevronDown, ChevronRight, Grid3X3, ListTree, SlidersHorizontal, Columns3, X } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button, Caps, Field, Modal, PageHeader, Panel, Select, TextInput } from "@/components/ui-kit";
-import { useStore, userName, users } from "@/store/app-store";
+import { organizations, projects, useStore, userName, users } from "@/store/app-store";
+import { CardsSkeleton, TableSkeleton } from "@/components/ui-kit";
+import { useSimulatedLoad } from "@/hooks/use-simulated-load";
 import type { BusinessProcess } from "@/data/types";
 import { cn } from "@/lib/utils";
 
@@ -107,8 +109,23 @@ function ProcessesPage() {
     setCreating(null);
   };
 
+  const ready = useSimulatedLoad(`${store.activeProjectId}:${store.personaId}`);
+  const project = projects.find((p) => p.id === store.activeProjectId)!;
+  const org = organizations.find((o) => o.id === project.orgId)!;
+  const canEdit = store.can("authorMaster");
+
+  if (!ready) {
+    return (
+      <AppShell breadcrumbs={[org.name, project.name, "Business Processes"]}>
+        <PageHeader title="Business Processes" subtitle="Loading this workspace…" />
+        <CardsSkeleton />
+        <TableSkeleton rows={8} />
+      </AppShell>
+    );
+  }
+
   return (
-    <AppShell breadcrumbs={["Business Processes", "Nortaxis Systems", "Organization master"]}>
+    <AppShell breadcrumbs={[org.name, project.name, "Business Processes"]}>
       <PageHeader
         title="Business Processes"
         subtitle={`${store.processes.length} nodes · organization-level master content · reusable across every project`}

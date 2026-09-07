@@ -13,7 +13,9 @@ import {
   TextArea,
   TextInput,
 } from "@/components/ui-kit";
-import { useStore, userName } from "@/store/app-store";
+import { organizations, projects, useStore, userName } from "@/store/app-store";
+import { CardsSkeleton, TableSkeleton } from "@/components/ui-kit";
+import { useSimulatedLoad } from "@/hooks/use-simulated-load";
 import type { Priority, TestStep } from "@/data/types";
 import { cn } from "@/lib/utils";
 
@@ -78,8 +80,23 @@ function TestCasesPage() {
     setEditing(true);
   };
 
+  const ready = useSimulatedLoad(`${store.activeProjectId}:${store.personaId}`);
+  const project = projects.find((p) => p.id === store.activeProjectId)!;
+  const org = organizations.find((o) => o.id === project.orgId)!;
+  const canEdit = store.can("authorMaster");
+
+  if (!ready) {
+    return (
+      <AppShell breadcrumbs={[org.name, project.name, "Test Case Repository"]}>
+        <PageHeader title="Test Case Repository" subtitle="Loading this workspace…" />
+        <CardsSkeleton />
+        <TableSkeleton rows={8} />
+      </AppShell>
+    );
+  }
+
   return (
-    <AppShell breadcrumbs={["Test Cases", "Nortaxis Systems", folder ? store.folders.find((f) => f.id === folder)!.name : "All folders"]}>
+    <AppShell breadcrumbs={[org.name, project.name, "Test Case Repository"]}>
       <PageHeader
         title="Test Case Repository"
         subtitle={`${store.cases.length} master cases · every save creates an immutable version · reusable across all projects`}

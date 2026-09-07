@@ -13,7 +13,9 @@ import {
   TextArea,
   TextInput,
 } from "@/components/ui-kit";
-import { useStore, userName, users } from "@/store/app-store";
+import { organizations, projects, useStore, userName, users } from "@/store/app-store";
+import { CardsSkeleton, TableSkeleton } from "@/components/ui-kit";
+import { useSimulatedLoad } from "@/hooks/use-simulated-load";
 import type { Priority } from "@/data/types";
 import { cn } from "@/lib/utils";
 
@@ -51,8 +53,23 @@ function RequirementsPage() {
   const linkedRuns = store.runs.filter((r) => linkedCases.some((c) => c.id === r.testCaseId));
   const linkedDefects = store.defects.filter((d) => linkedRuns.some((r) => r.id === d.runId));
 
+  const ready = useSimulatedLoad(`${store.activeProjectId}:${store.personaId}`);
+  const project = projects.find((p) => p.id === store.activeProjectId)!;
+  const org = organizations.find((o) => o.id === project.orgId)!;
+  const canEdit = store.can("authorMaster");
+
+  if (!ready) {
+    return (
+      <AppShell breadcrumbs={[org.name, project.name, "Requirements"]}>
+        <PageHeader title="Requirements" subtitle="Loading this workspace…" />
+        <CardsSkeleton />
+        <TableSkeleton rows={8} />
+      </AppShell>
+    );
+  }
+
   return (
-    <AppShell breadcrumbs={["Requirements", "Nortaxis Systems", "Organization master"]}>
+    <AppShell breadcrumbs={[org.name, project.name, "Requirements"]}>
       <PageHeader
         title="Requirements"
         subtitle={`${store.requirements.length} requirements · sourced from documents, integrations and prior projects`}
