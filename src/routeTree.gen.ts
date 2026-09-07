@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlansRouteImport } from './routes/plans'
 import { Route as ProcessesRouteImport } from './routes/processes'
 import { Route as RequirementsRouteImport } from './routes/requirements'
 import { Route as ScenariosRouteImport } from './routes/scenarios'
@@ -18,6 +19,11 @@ import { Route as TestCasesRouteImport } from './routes/test-cases'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlansRoute = PlansRouteImport.update({
+  id: '/plans',
+  path: '/plans',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProcessesRoute = ProcessesRouteImport.update({
@@ -43,6 +49,7 @@ const TestCasesRoute = TestCasesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/plans': typeof PlansRoute
   '/processes': typeof ProcessesRoute
   '/requirements': typeof RequirementsRoute
   '/scenarios': typeof ScenariosRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/plans': typeof PlansRoute
   '/processes': typeof ProcessesRoute
   '/requirements': typeof RequirementsRoute
   '/scenarios': typeof ScenariosRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/plans': typeof PlansRoute
   '/processes': typeof ProcessesRoute
   '/requirements': typeof RequirementsRoute
   '/scenarios': typeof ScenariosRoute
@@ -65,12 +74,25 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/processes' | '/requirements' | '/scenarios' | '/test-cases'
+  fullPaths:
+    | '/'
+    | '/plans'
+    | '/processes'
+    | '/requirements'
+    | '/scenarios'
+    | '/test-cases'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/processes' | '/requirements' | '/scenarios' | '/test-cases'
+  to:
+    | '/'
+    | '/plans'
+    | '/processes'
+    | '/requirements'
+    | '/scenarios'
+    | '/test-cases'
   id:
     | '__root__'
     | '/'
+    | '/plans'
     | '/processes'
     | '/requirements'
     | '/scenarios'
@@ -79,6 +101,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PlansRoute: typeof PlansRoute
   ProcessesRoute: typeof ProcessesRoute
   RequirementsRoute: typeof RequirementsRoute
   ScenariosRoute: typeof ScenariosRoute
@@ -92,6 +115,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plans': {
+      id: '/plans'
+      path: '/plans'
+      fullPath: '/plans'
+      preLoaderRoute: typeof PlansRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/processes': {
@@ -127,6 +157,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PlansRoute: PlansRoute,
   ProcessesRoute: ProcessesRoute,
   RequirementsRoute: RequirementsRoute,
   ScenariosRoute: ScenariosRoute,
