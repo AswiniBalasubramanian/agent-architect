@@ -132,9 +132,9 @@ export function Button({
   disabled?: boolean;
 }) {
   const styles = {
-    primary: "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90",
-    ghost: "border border-border bg-background text-foreground shadow-sm hover:bg-muted",
-    danger: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+    primary: "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
+    ghost: "border border-border bg-background text-foreground hover:bg-muted",
+    danger: "bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90",
   }[variant];
   return (
     <button
