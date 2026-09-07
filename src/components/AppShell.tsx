@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   AlertTriangle,
   Bug,
+  Check,
   CheckSquare2,
   ChevronDown,
   ChevronLeft,
@@ -18,8 +19,17 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { Fragment, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui-kit";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { currentUser, organizations, projects, useStore } from "@/store/app-store";
 import { slaState } from "@/lib/sla";
 import { cn } from "@/lib/utils";
@@ -62,7 +72,6 @@ export function AppShell({
 }) {
   const store = useStore();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const [switcherOpen, setSwitcherOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -94,50 +103,66 @@ export function AppShell({
         ) : null}
       </div>
 
-      <div className="relative p-2">
-        <button
-          onClick={() => setSwitcherOpen((value) => !value)}
-          title={collapsed && !mobile ? `${org.name} — ${project.name}` : undefined}
-          className={cn(
-            "flex w-full items-center rounded-md border border-border bg-background text-left shadow-sm hover:bg-muted",
-            collapsed && !mobile ? "justify-center p-1.5" : "gap-2.5 px-2.5 py-2",
-          )}
-        >
-          <div className="grid size-7 shrink-0 place-items-center rounded-md bg-accent/10 text-xs font-semibold text-accent">
-            {org.name[0]}
-          </div>
-          {collapsed && !mobile ? null : (
-            <>
-              <div className="min-w-0 flex-1 leading-tight">
-                <div className="truncate text-xs font-medium">{org.name}</div>
-                <div className="truncate text-[10px] text-muted-foreground">{project.name}</div>
+      <div className="p-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              title={collapsed && !mobile ? `${org.name} — ${project.name}` : undefined}
+              className={cn(
+                "flex w-full items-center rounded-md border border-border bg-background text-left shadow-sm hover:bg-muted",
+                collapsed && !mobile ? "justify-center p-1.5" : "gap-2.5 px-2.5 py-2",
+              )}
+            >
+              <div className="grid size-7 shrink-0 place-items-center rounded-md bg-accent/10 text-xs font-semibold text-accent">
+                {org.name[0]}
               </div>
-              <ChevronDown className="size-3.5 text-muted-foreground" />
-            </>
-          )}
-        </button>
-        {switcherOpen ? (
-          <div className={cn("absolute top-12 z-30 min-w-52 rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-md", collapsed && !mobile ? "left-14" : "inset-x-2")}>
-            {projects.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => {
-                  store.setActiveProject(item.id);
-                  setSwitcherOpen(false);
-                }}
-                className={cn(
-                  "block w-full rounded-sm px-2 py-1.5 text-left text-xs hover:bg-muted",
-                  item.id === project.id && "bg-muted font-medium",
-                )}
-              >
-                {item.name}
-                <span className="block text-[10px] text-muted-foreground">
-                  {organizations.find((organization) => organization.id === item.orgId)?.name}
-                </span>
-              </button>
-            ))}
-          </div>
-        ) : null}
+              {collapsed && !mobile ? null : (
+                <>
+                  <div className="min-w-0 flex-1 leading-tight">
+                    <div className="truncate text-xs font-medium">{org.name}</div>
+                    <div className="truncate text-[10px] text-muted-foreground">{project.name}</div>
+                  </div>
+                  <ChevronDown className="size-3.5 text-muted-foreground" />
+                </>
+              )}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="start"
+            side={collapsed && !mobile ? "right" : "bottom"}
+            sideOffset={6}
+            className="w-56 rounded-xl"
+          >
+            <DropdownMenuLabel className="text-xs text-muted-foreground">Workspaces</DropdownMenuLabel>
+            {organizations.map((organization, orgIndex) => {
+              const orgProjects = projects.filter((item) => item.orgId === organization.id);
+              if (orgProjects.length === 0) return null;
+              return (
+                <Fragment key={organization.id}>
+                  {orgIndex > 0 ? <DropdownMenuSeparator /> : null}
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel className="px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                      {organization.name}
+                    </DropdownMenuLabel>
+                    {orgProjects.map((item) => (
+                      <DropdownMenuItem
+                        key={item.id}
+                        onSelect={() => store.setActiveProject(item.id)}
+                        className="gap-2"
+                      >
+                        <Check className={cn("size-3.5 shrink-0", item.id === project.id ? "text-foreground" : "text-transparent")} />
+                        <div className="min-w-0 flex-1 leading-tight">
+                          <div className="truncate text-[13px]">{item.name}</div>
+                          <div className="truncate text-[10px] text-muted-foreground">{item.id.toUpperCase()}</div>
+                        </div>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuGroup>
+                </Fragment>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 py-2">
