@@ -66,27 +66,22 @@ function DefectsPage() {
       <PageHeader
         title="Defects & SLA"
         subtitle={`${store.defects.length} defects · ${breached} SLA breached · ${atRisk} at risk`}
-        actions={<Button onClick={() => setCreating(true)}>Log defect</Button>}
+        actions={
+          <div className="flex items-center gap-2">
+            <Select className="w-40" value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Filter by status">
+              {["All", "New", "Triaged", "In Progress", "Resolved", "Closed", "Rejected"].map((s) => (
+                <option key={s}>{s}</option>
+              ))}
+            </Select>
+            <Select className="w-32" value={severity} onChange={(e) => setSeverity(e.target.value)} aria-label="Filter by severity">
+              {["All", "Sev 1", "Sev 2", "Sev 3", "Sev 4"].map((s) => (
+                <option key={s}>{s}</option>
+              ))}
+            </Select>
+            <Button onClick={() => setCreating(true)}>Log defect</Button>
+          </div>
+        }
       />
-
-      <Panel className="flex flex-wrap items-end gap-3 p-3">
-        <div>
-          <Caps>Status</Caps>
-          <Select className="mt-1 w-40" value={status} onChange={(e) => setStatus(e.target.value)}>
-            {["All", "New", "Triaged", "In Progress", "Resolved", "Closed", "Rejected"].map((s) => (
-              <option key={s}>{s}</option>
-            ))}
-          </Select>
-        </div>
-        <div>
-          <Caps>Severity</Caps>
-          <Select className="mt-1 w-32" value={severity} onChange={(e) => setSeverity(e.target.value)}>
-            {["All", "Sev 1", "Sev 2", "Sev 3", "Sev 4"].map((s) => (
-              <option key={s}>{s}</option>
-            ))}
-          </Select>
-        </div>
-      </Panel>
 
       <div className="grid grid-cols-12 gap-3">
         <Panel className="col-span-12 overflow-x-auto p-0 lg:col-span-7">
