@@ -16,6 +16,7 @@ import {
 import { organizations, projects, useStore, userName } from "@/store/app-store";
 import { CardsSkeleton, TableSkeleton } from "@/components/ui-kit";
 import { AiAssist } from "@/components/ai-assist";
+import { BulkImportTestCases } from "@/components/bulk-import";
 import { draftSteps } from "@/lib/ai";
 import { useSimulatedLoad } from "@/hooks/use-simulated-load";
 import type { Priority, TestStep } from "@/data/types";
@@ -44,6 +45,7 @@ function TestCasesPage() {
   const [selected, setSelected] = useState<string | null>(store.cases[0]?.id ?? null);
   const [viewVersion, setViewVersion] = useState<number | null>(null);
   const [creating, setCreating] = useState(false);
+  const [importing, setImporting] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<TestStep[]>([]);
   const [changeNote, setChangeNote] = useState("");
@@ -99,12 +101,18 @@ function TestCasesPage() {
 
   return (
     <AppShell breadcrumbs={[org.name, project.name, "Test Case Repository"]}>
+      <BulkImportTestCases open={importing} onClose={() => setImporting(false)} />
       <PageHeader
         title="Test Case Repository"
         subtitle={`${store.cases.length} master cases · every save creates an immutable version · reusable across all projects`}
         actions={
           <>
             <TextInput value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search cases…" className="w-52" />
+            {canEdit ? (
+              <Button variant="ghost" onClick={() => setImporting(true)}>
+                Bulk import
+              </Button>
+            ) : null}
             {canEdit ? <Button onClick={() => setCreating(true)}>New test case</Button> : null}
           </>
         }
