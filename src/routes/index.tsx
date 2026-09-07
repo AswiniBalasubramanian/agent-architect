@@ -149,48 +149,49 @@ function Dashboard() {
             <Link to="/runs" className="font-medium text-foreground hover:text-primary">View executions →</Link>
           </div>
         </Panel>
+        <div className="col-span-12 flex flex-col gap-3 lg:col-span-5">
+          <Panel className="flex flex-col gap-1 p-4">
+            <Caps>Defects</Caps>
+            <div className="font-display text-[34px] leading-none font-semibold">{openDefects.length}</div>
+            <div className="mt-1 flex items-center gap-1.5 text-[11px]">
+              <span className="size-1.5 rounded-full bg-fail" />
+              <span className="font-mono text-fail">
+                {openDefects.filter((d) => slaState(d, store.slaRules, now).breached).length} SLA breach
+              </span>
+            </div>
+          </Panel>
 
-
-        <Panel className="col-span-6 flex flex-col justify-between p-4 lg:col-span-2">
-          <Caps>Defects</Caps>
-          <div className="font-display text-[30px] leading-none font-semibold">{openDefects.length}</div>
-          <div className="mt-1 flex items-center gap-1.5 text-[11px]">
-            <span className="size-1.5 rounded-full bg-fail" />
-            <span className="font-mono text-fail">
-              {openDefects.filter((d) => slaState(d, store.slaRules, now).breached).length} SLA breach
-            </span>
-          </div>
-        </Panel>
-
-        <Panel className="col-span-6 flex flex-col justify-between p-4 lg:col-span-3">
-          {(() => {
-            const totalReq = store.requirements.length;
-            const pct = totalReq ? Math.round((covered / totalReq) * 100) : 0;
-            const tone = pct >= 80 ? "bg-pass" : pct >= 50 ? "bg-block" : "bg-fail";
-            const toneText = pct >= 80 ? "text-pass" : pct >= 50 ? "text-block" : "text-fail";
-            const label = pct >= 80 ? "Healthy" : pct >= 50 ? "At risk" : "Critical gap";
-            return (
-              <>
-                <div className="flex items-center justify-between">
-                  <Caps>Requirement coverage</Caps>
-                  <span className={`font-mono text-[10px] ${toneText}`}>{label}</span>
-                </div>
-                <div className="font-display text-[26px] leading-none font-semibold">{pct}%</div>
-                <div
-                  className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted"
-                  title={`${covered} covered · ${totalReq - covered} uncovered`}
-                >
-                  <div className={`h-full rounded-full ${tone}`} style={{ width: `${pct}%` }} />
-                </div>
-                <div className="mt-1 font-mono text-[10px] text-muted-foreground">
-                  {covered} of {totalReq} requirements have test cases · {totalReq - covered} uncovered
-                </div>
-              </>
-            );
-          })()}
-        </Panel>
+          <Panel className="flex flex-1 flex-col p-4">
+            {(() => {
+              const totalReq = store.requirements.length;
+              const pct = totalReq ? Math.round((covered / totalReq) * 100) : 0;
+              const tone = pct >= 80 ? "bg-pass" : pct >= 50 ? "bg-block" : "bg-fail";
+              const toneText = pct >= 80 ? "text-pass" : pct >= 50 ? "text-block" : "text-fail";
+              const label = pct >= 80 ? "Healthy" : pct >= 50 ? "At risk" : "Critical gap";
+              return (
+                <>
+                  <div className="flex items-center justify-between">
+                    <Caps>Requirement coverage</Caps>
+                    <span className={`font-mono text-[10px] ${toneText}`}>{label}</span>
+                  </div>
+                  <div className="mt-3 font-display text-[34px] leading-none font-semibold">{pct}%</div>
+                  <div
+                    className="mt-3 h-2 overflow-hidden rounded-full bg-muted"
+                    title={`${covered} covered · ${totalReq - covered} uncovered`}
+                  >
+                    <div className={`h-full rounded-full ${tone}`} style={{ width: `${pct}%` }} />
+                  </div>
+                  <div className="mt-2 font-mono text-[10px] text-muted-foreground">
+                    {covered} of {totalReq} requirements have test cases · {totalReq - covered} uncovered
+                  </div>
+                </>
+              );
+            })()}
+          </Panel>
+        </div>
 
       </div>
+
 
       <div className="grid grid-cols-12 gap-3">
         <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-7">
