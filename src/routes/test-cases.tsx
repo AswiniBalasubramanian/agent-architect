@@ -164,7 +164,32 @@ function TestCasesPage() {
         </Panel>
 
         <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-5">
-          <div className="grid grid-cols-[minmax(0,2fr)_90px_70px_60px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
+          {canEdit && checked.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-2 border-b border-border bg-muted/60 px-4 py-2 text-[11.5px]">
+              <span className="font-mono text-[10px] text-muted-foreground">{checked.length} selected</span>
+              <Select value={moveTo} onChange={(e) => setMoveTo(e.target.value)} className="w-40">
+                {store.folders.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.name}
+                  </option>
+                ))}
+              </Select>
+              <Button
+                onClick={() => {
+                  store.moveCasesToFolder(checked, moveTo);
+                  setChecked([]);
+                }}
+              >
+                Move to folder
+              </Button>
+              <Button variant="ghost" onClick={() => setChecked([])}>
+                Clear
+              </Button>
+              <span className="ml-auto font-mono text-[10px] text-muted-foreground">or drag onto a folder</span>
+            </div>
+          ) : null}
+          <div className="grid grid-cols-[22px_minmax(0,2fr)_90px_70px_60px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
+            <span />
             <span>CASE</span>
             <span>TYPE</span>
             <span>PRIORITY</span>
@@ -172,18 +197,31 @@ function TestCasesPage() {
           </div>
           <div className="max-h-[560px] divide-y divide-border overflow-y-auto text-[12px]">
             {cases.map((c) => (
-              <button
+              <div
                 key={c.id}
+                draggable={canEdit}
+                onDragStart={(e) => e.dataTransfer.setData("text/plain", c.id)}
                 onClick={() => {
                   setSelected(c.id);
                   setViewVersion(null);
                   setEditing(false);
                 }}
                 className={cn(
-                  "grid w-full grid-cols-[minmax(0,2fr)_90px_70px_60px] items-center gap-2 px-4 py-2.5 text-left hover:bg-muted/70",
+                  "grid w-full cursor-pointer grid-cols-[22px_minmax(0,2fr)_90px_70px_60px] items-center gap-2 px-4 py-2.5 text-left hover:bg-muted/70",
                   selected === c.id && "bg-muted",
                 )}
               >
+                <input
+                  type="checkbox"
+                  aria-label={`Select ${c.name}`}
+                  disabled={!canEdit}
+                  checked={checked.includes(c.id)}
+                  onClick={(e) => e.stopPropagation()}
+                  onChange={(e) =>
+                    setChecked(e.target.checked ? [...checked, c.id] : checked.filter((x) => x !== c.id))
+                  }
+                  className="size-3.5 accent-primary"
+                />
                 <div className="min-w-0">
                   <div className="truncate font-medium">{c.name}</div>
                   <div className="truncate font-mono text-[10px] text-muted-foreground">
@@ -193,10 +231,11 @@ function TestCasesPage() {
                 <span className="truncate font-mono text-[10px] text-muted-foreground">{c.testingType}</span>
                 <PriorityTag priority={c.priority} />
                 <span className="text-right font-mono text-[10px] text-muted-foreground">v{c.versions.length}</span>
-              </button>
+              </div>
             ))}
           </div>
         </Panel>
+
 
         <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-5">
           {active && version ? (
