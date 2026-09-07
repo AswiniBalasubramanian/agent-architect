@@ -127,7 +127,7 @@ export function Meter({
   let acc = 0;
   for (const s of segments) {
     acc += s.value / total;
-    bounds.push({ upto: acc, className: s.className, label: s.label });
+    bounds.push({ upto: acc, className: s.className, ...(s.label !== undefined ? { label: s.label } : {}) });
   }
   return (
     <div className={cn("flex w-full gap-[3px]", className)}>
