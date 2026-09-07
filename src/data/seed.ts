@@ -19,6 +19,7 @@ import type {
   TestRunStep,
   TestScenario,
   StepStatus,
+  Severity,
 } from "./types";
 
 const iso = (daysAgo: number, hour = 9) => {
