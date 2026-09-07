@@ -246,7 +246,7 @@ function Dashboard() {
             all runs →
           </Link>
         </div>
-        <div className="grid grid-cols-[minmax(0,1.7fr)_minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1.2fr)] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
+        <div className="grid grid-cols-[minmax(0,1.7fr)_minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1.2fr)] gap-2 border-b border-border bg-muted px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
           <span>RUN / CASE</span>
           <span>OWNER</span>
           <span>ENV</span>
