@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProcessesRouteImport } from './routes/processes'
 import { Route as RequirementsRouteImport } from './routes/requirements'
+import { Route as TestCasesRouteImport } from './routes/test-cases'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,44 @@ const RequirementsRoute = RequirementsRouteImport.update({
   path: '/requirements',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TestCasesRoute = TestCasesRouteImport.update({
+  id: '/test-cases',
+  path: '/test-cases',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/processes': typeof ProcessesRoute
   '/requirements': typeof RequirementsRoute
+  '/test-cases': typeof TestCasesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/processes': typeof ProcessesRoute
   '/requirements': typeof RequirementsRoute
+  '/test-cases': typeof TestCasesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/processes': typeof ProcessesRoute
   '/requirements': typeof RequirementsRoute
+  '/test-cases': typeof TestCasesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/processes' | '/requirements'
+  fullPaths: '/' | '/processes' | '/requirements' | '/test-cases'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/processes' | '/requirements'
-  id: '__root__' | '/' | '/processes' | '/requirements'
+  to: '/' | '/processes' | '/requirements' | '/test-cases'
+  id: '__root__' | '/' | '/processes' | '/requirements' | '/test-cases'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProcessesRoute: typeof ProcessesRoute
   RequirementsRoute: typeof RequirementsRoute
+  TestCasesRoute: typeof TestCasesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RequirementsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/test-cases': {
+      id: '/test-cases'
+      path: '/test-cases'
+      fullPath: '/test-cases'
+      preLoaderRoute: typeof TestCasesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProcessesRoute: ProcessesRoute,
   RequirementsRoute: RequirementsRoute,
+  TestCasesRoute: TestCasesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
