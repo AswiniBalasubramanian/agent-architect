@@ -66,12 +66,28 @@ const sevTone: Record<Severity, string> = {
   "Sev 4": "bg-pending/20 text-muted-foreground",
 };
 
+const sevLabel: Record<Severity, string> = {
+  "Sev 1": "Critical",
+  "Sev 2": "High",
+  "Sev 3": "Medium",
+  "Sev 4": "Low",
+};
+
+const sevDescription: Record<Severity, string> = {
+  "Sev 1": "Critical / Blocker: A major system outage or severe defect with no workaround. Core business functions are down.",
+  "Sev 2": "High / Major: A significant feature is broken or severely degraded, but some functions or workarounds may still exist.",
+  "Sev 3": "Medium / Moderate: A non-critical feature is malfunctioning or displaying incorrect data.",
+  "Sev 4": "Low / Minor: Cosmetic glitches, minor UI alignment issues, or small typos that do not impact functionality.",
+};
+
 export function SeverityPill({ severity }: { severity: Severity }) {
   return (
-    <span className={cn("inline-flex items-center gap-1 rounded-md border border-current/15 px-2 py-0.5 text-[10px] font-medium", sevTone[severity])}>
-      <i className="size-1.5 rounded-full bg-current" />
-      {severity}
-    </span>
+    <Tooltip content={sevDescription[severity]}>
+      <span className={cn("inline-flex items-center gap-1 rounded-md border border-current/15 px-2 py-0.5 text-[10px] font-medium", sevTone[severity])}>
+        <i className="size-1.5 rounded-full bg-current" />
+        {sevLabel[severity]}
+      </span>
+    </Tooltip>
   );
 }
 
