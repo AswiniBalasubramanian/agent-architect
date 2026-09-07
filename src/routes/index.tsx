@@ -163,17 +163,33 @@ function Dashboard() {
         </Panel>
 
         <Panel className="col-span-6 flex flex-col justify-between p-4 lg:col-span-3">
-          <Caps>Requirement coverage</Caps>
-          <div className="font-display text-[26px] leading-none font-semibold">
-            {Math.round((covered / store.requirements.length) * 100)}%
-          </div>
-          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
-            <div className="h-full rounded-full bg-accent" style={{ width: `${(covered / store.requirements.length) * 100}%` }} />
-          </div>
-          <div className="mt-1 font-mono text-[10px] text-muted-foreground">
-            {covered} of {store.requirements.length} requirements have test cases
-          </div>
+          {(() => {
+            const totalReq = store.requirements.length;
+            const pct = totalReq ? Math.round((covered / totalReq) * 100) : 0;
+            const tone = pct >= 80 ? "bg-pass" : pct >= 50 ? "bg-block" : "bg-fail";
+            const toneText = pct >= 80 ? "text-pass" : pct >= 50 ? "text-block" : "text-fail";
+            const label = pct >= 80 ? "Healthy" : pct >= 50 ? "At risk" : "Critical gap";
+            return (
+              <>
+                <div className="flex items-center justify-between">
+                  <Caps>Requirement coverage</Caps>
+                  <span className={`font-mono text-[10px] ${toneText}`}>{label}</span>
+                </div>
+                <div className="font-display text-[26px] leading-none font-semibold">{pct}%</div>
+                <div
+                  className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted"
+                  title={`${covered} covered · ${totalReq - covered} uncovered`}
+                >
+                  <div className={`h-full rounded-full ${tone}`} style={{ width: `${pct}%` }} />
+                </div>
+                <div className="mt-1 font-mono text-[10px] text-muted-foreground">
+                  {covered} of {totalReq} requirements have test cases · {totalReq - covered} uncovered
+                </div>
+              </>
+            );
+          })()}
         </Panel>
+
       </div>
 
       <div className="grid grid-cols-12 gap-3">
