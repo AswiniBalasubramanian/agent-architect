@@ -5,9 +5,9 @@ import {
   Check,
   CheckSquare2,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   ClipboardCheck,
+  PanelLeft,
+  PanelRight,
   FileCheck2,
   FolderKanban,
   LayoutDashboard,
@@ -235,7 +235,7 @@ export function AppShell({
               <span className="sr-only">Open navigation</span>
             </Button>
             <Button variant="ghost" className="hidden size-8 px-0 lg:inline-flex" onClick={() => setCollapsed((value) => !value)}>
-              {collapsed ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
+              {collapsed ? <PanelRight className="size-4" /> : <PanelLeft className="size-4" />}
               <span className="sr-only">{collapsed ? "Expand navigation" : "Collapse navigation"}</span>
             </Button>
             <div className="hidden h-5 w-px bg-border sm:block" />
