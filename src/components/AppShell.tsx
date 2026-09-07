@@ -88,7 +88,7 @@ export function AppShell({
   const sidebar = (mobile = false) => (
     <div className="flex h-full flex-col bg-card text-card-foreground">
       <div className={cn("flex h-14 items-center border-b border-border", collapsed && !mobile ? "justify-center px-2" : "gap-2.5 px-3")}>
-        <div className="grid size-8 shrink-0 place-items-center rounded-md bg-primary text-sm font-bold text-primary-foreground">K</div>
+        <img src="/favicon.svg" alt="KTern.AI" className="size-8 shrink-0" />
         {collapsed && !mobile ? null : (
           <div className="min-w-0 flex-1 leading-tight">
             <div className="truncate text-sm font-semibold">KTern.AI</div>
