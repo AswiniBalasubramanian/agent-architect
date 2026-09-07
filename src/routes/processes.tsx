@@ -87,23 +87,27 @@ function ProcessesPage() {
         subtitle={`${store.processes.length} nodes · organization-level master content · reusable across every project`}
         actions={
           <>
-            <div className="flex rounded-md border border-border bg-card p-0.5" aria-label="Process view">
-              <Button
-                variant={view === "grid" ? "primary" : "ghost"}
-                onClick={() => setView("grid")}
-                className="gap-1.5 border-0 shadow-none"
-              >
-                <Grid3X3 className="size-3.5" />
-                Grid
-              </Button>
-              <Button
-                variant={view === "tree" ? "primary" : "ghost"}
-                onClick={() => setView("tree")}
-                className="gap-1.5 border-0 shadow-none"
-              >
-                <ListTree className="size-3.5" />
-                Tree
-              </Button>
+            <div className="flex items-center gap-1 rounded-full bg-muted p-1" aria-label="Process view">
+              {(
+                [
+                  { id: "grid", label: "Grid", icon: Grid3X3 },
+                  { id: "tree", label: "Tree", icon: ListTree },
+                ] as const
+              ).map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setView(opt.id)}
+                  className={
+                    view === opt.id
+                      ? "inline-flex min-h-8 items-center gap-1.5 rounded-full bg-card px-4 text-[13px] font-medium text-foreground shadow-sm"
+                      : "inline-flex min-h-8 items-center gap-1.5 rounded-full px-4 text-[13px] font-medium text-muted-foreground hover:text-foreground"
+                  }
+                >
+                  <opt.icon className="size-3.5" />
+                  {opt.label}
+                </button>
+              ))}
             </div>
             <Button onClick={() => setCreating({ parentId: selected })}>
               {selected ? "Add child node" : "Add root node"}
