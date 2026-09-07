@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   AlertTriangle,
   Bug,
+  Check,
   CheckSquare2,
   ChevronDown,
   ChevronLeft,
@@ -18,8 +19,17 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { Fragment, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui-kit";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { currentUser, organizations, projects, useStore } from "@/store/app-store";
 import { slaState } from "@/lib/sla";
 import { cn } from "@/lib/utils";
@@ -62,7 +72,6 @@ export function AppShell({
 }) {
   const store = useStore();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const [switcherOpen, setSwitcherOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
