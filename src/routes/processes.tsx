@@ -320,11 +320,11 @@ function ProcessesPage() {
                     ) : <span className="w-6" />}
                     <span className="truncate font-medium">{node.name}</span>
                   </div>
-                  <span className="truncate text-muted-foreground">{node.levelType}</span>
-                  <span className="truncate font-mono text-[10px] text-muted-foreground">{node.application}</span>
-                  <span className="truncate text-muted-foreground">{userName(node.owner)}</span>
-                  <span className="font-mono text-[10px] text-muted-foreground">{cov.cases} cases · {cov.passed} pass</span>
-                  <span className="text-right font-mono text-[10px] text-muted-foreground">{node.sourceType}</span>
+                  {columns.levelType && <span className="truncate text-muted-foreground">{node.levelType}</span>}
+                  {columns.application && <span className="truncate font-mono text-[10px] text-muted-foreground">{node.application}</span>}
+                  {columns.owner && <span className="truncate text-muted-foreground">{userName(node.owner)}</span>}
+                  {columns.coverage && <span className="font-mono text-[10px] text-muted-foreground">{cov.cases} cases · {cov.passed} pass</span>}
+                  {columns.source && <span className="text-right font-mono text-[10px] text-muted-foreground">{node.sourceType}</span>}
                 </div>
               );
             })}
