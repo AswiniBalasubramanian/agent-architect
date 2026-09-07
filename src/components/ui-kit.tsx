@@ -132,9 +132,9 @@ export function Button({
   disabled?: boolean;
 }) {
   const styles = {
-    primary: "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90",
-    ghost: "border border-border bg-background text-foreground shadow-sm hover:bg-muted",
-    danger: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+    primary: "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
+    ghost: "border border-border bg-background text-foreground hover:bg-muted",
+    danger: "bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90",
   }[variant];
   return (
     <button
@@ -142,7 +142,7 @@ export function Button({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "inline-flex min-h-8 items-center justify-center rounded-md px-3 py-1.5 text-[12px] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40",
+        "inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg px-3.5 py-1.5 text-[13px] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40",
         styles,
         className,
       )}
@@ -162,7 +162,7 @@ export function Field({ label, children }: { label: string; children: ReactNode 
 }
 
 const controlClass =
-  "w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-[12.5px] text-foreground shadow-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
+  "w-full rounded-lg border border-input bg-background px-3 py-2 text-[13px] text-foreground shadow-xs outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
 
 export function TextInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={cn(controlClass, props.className)} />;

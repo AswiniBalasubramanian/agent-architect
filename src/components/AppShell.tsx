@@ -24,16 +24,33 @@ import { currentUser, organizations, projects, useStore } from "@/store/app-stor
 import { slaState } from "@/lib/sla";
 import { cn } from "@/lib/utils";
 
-const nav: { to: string; label: string; icon: LucideIcon }[] = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/processes", label: "Business Processes", icon: Network },
-  { to: "/requirements", label: "Requirements", icon: FileCheck2 },
-  { to: "/test-cases", label: "Test Cases", icon: CheckSquare2 },
-  { to: "/scenarios", label: "Scenarios", icon: FolderKanban },
-  { to: "/plans", label: "Test Plans", icon: ClipboardCheck },
-  { to: "/runs", label: "Test Runs", icon: TestTube2 },
-  { to: "/defects", label: "Defects", icon: Bug },
-  { to: "/admin", label: "Administration", icon: Settings2 },
+type NavItem = { to: string; label: string; icon: LucideIcon };
+
+const navGroups: { heading: string; items: NavItem[] }[] = [
+  {
+    heading: "Overview",
+    items: [
+      { to: "/", label: "Dashboard", icon: LayoutDashboard },
+      { to: "/processes", label: "Business Processes", icon: Network },
+      { to: "/requirements", label: "Requirements", icon: FileCheck2 },
+    ],
+  },
+  {
+    heading: "Execution",
+    items: [
+      { to: "/test-cases", label: "Test Cases", icon: CheckSquare2 },
+      { to: "/scenarios", label: "Scenarios", icon: FolderKanban },
+      { to: "/plans", label: "Test Plans", icon: ClipboardCheck },
+      { to: "/runs", label: "Test Runs", icon: TestTube2 },
+    ],
+  },
+  {
+    heading: "Quality",
+    items: [
+      { to: "/defects", label: "Defects", icon: Bug },
+      { to: "/admin", label: "Administration", icon: Settings2 },
+    ],
+  },
 ];
 
 export function AppShell({
@@ -123,30 +140,41 @@ export function AppShell({
         ) : null}
       </div>
 
-      <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-2">
-        {nav.map((item) => {
-          const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.to}
-              to={item.to}
-              onClick={() => setMobileOpen(false)}
-              title={collapsed && !mobile ? item.label : undefined}
-              className={cn(
-                "flex h-9 items-center rounded-md text-[12.5px] font-medium",
-                collapsed && !mobile ? "justify-center px-2" : "gap-3 px-3",
-                active ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted hover:text-foreground",
-              )}
-            >
-              <Icon className="size-4 shrink-0" />
-              {collapsed && !mobile ? null : <span className="truncate">{item.label}</span>}
-              {item.to === "/defects" && slaOpen > 0 && (!collapsed || mobile) ? (
-                <span className="ml-auto rounded-md bg-destructive/10 px-1.5 py-0.5 text-[9px] font-semibold text-destructive">{slaOpen}</span>
-              ) : null}
-            </Link>
-          );
-        })}
+      <nav className="flex-1 overflow-y-auto px-2 py-2">
+        {navGroups.map((group, groupIndex) => (
+          <div key={group.heading} className={cn(groupIndex > 0 && (collapsed && !mobile ? "mt-3 border-t border-border pt-3" : "mt-4"))}>
+            {collapsed && !mobile ? null : (
+              <div className="px-3 pb-1.5 text-[11px] font-medium text-muted-foreground">{group.heading}</div>
+            )}
+            <div className="space-y-0.5">
+              {group.items.map((item) => {
+                const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setMobileOpen(false)}
+                    title={collapsed && !mobile ? item.label : undefined}
+                    className={cn(
+                      "flex h-9 items-center rounded-lg text-[13px]",
+                      collapsed && !mobile ? "justify-center px-2" : "gap-2.5 px-3",
+                      active
+                        ? "bg-muted font-medium text-foreground"
+                        : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+                    )}
+                  >
+                    <Icon className={cn("size-4 shrink-0", active ? "text-foreground" : "text-muted-foreground")} />
+                    {collapsed && !mobile ? null : <span className="truncate">{item.label}</span>}
+                    {item.to === "/defects" && slaOpen > 0 && (!collapsed || mobile) ? (
+                      <span className="ml-auto rounded-md bg-destructive/10 px-1.5 py-0.5 text-[10px] font-semibold text-destructive">{slaOpen}</span>
+                    ) : null}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
       <div className={cn("border-t border-border p-2", collapsed && !mobile ? "flex justify-center" : "flex items-center gap-2.5")}>
