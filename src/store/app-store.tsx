@@ -307,6 +307,43 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         })),
       updateTestCase: (id, p) =>
         patch((s) => ({ cases: s.cases.map((c) => (c.id === id ? { ...c, ...p } : c)) })),
+      cloneTestCase: (id) =>
+        patch((s) => {
+          const src = s.cases.find((c) => c.id === id);
+          if (!src) return {};
+          const key = `TC-${5000 + s.cases.length}`;
+          const now = new Date().toISOString();
+          const author = personaUser(s.personaId).id;
+          const latest = src.versions[src.versions.length - 1]!;
+          return {
+            cases: [
+              {
+                ...src,
+                id: uid("tc"),
+                key,
+                name: `${src.name} (copy)`,
+                owner: author,
+                sourceType: "Library",
+                createdOn: now,
+                versions: [
+                  {
+                    id: `${key}-v1`,
+                    version: 1,
+                    createdBy: author,
+                    createdOn: now,
+                    changeNote: `Cloned from ${src.key} v${latest.version}`,
+                    steps: latest.steps.map((st) => ({ ...st, id: uid("st") })),
+                  },
+                ],
+              },
+              ...s.cases,
+            ],
+          };
+        }),
+      moveCasesToFolder: (ids, folderId) =>
+        patch((s) => ({
+          cases: s.cases.map((c) => (ids.includes(c.id) ? { ...c, folderId } : c)),
+        })),
 
       addScenario: (input) =>
         patch((s) => ({
