@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DefectsRouteImport } from './routes/defects'
 import { Route as PlansRouteImport } from './routes/plans'
 import { Route as ProcessesRouteImport } from './routes/processes'
 import { Route as RequirementsRouteImport } from './routes/requirements'
@@ -21,6 +22,11 @@ import { Route as RunsRunIdRouteImport } from './routes/runs.$runId'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DefectsRoute = DefectsRouteImport.update({
+  id: '/defects',
+  path: '/defects',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlansRoute = PlansRouteImport.update({
@@ -61,6 +67,7 @@ const RunsRunIdRoute = RunsRunIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/defects': typeof DefectsRoute
   '/plans': typeof PlansRoute
   '/processes': typeof ProcessesRoute
   '/requirements': typeof RequirementsRoute
@@ -71,6 +78,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/defects': typeof DefectsRoute
   '/plans': typeof PlansRoute
   '/processes': typeof ProcessesRoute
   '/requirements': typeof RequirementsRoute
@@ -82,6 +90,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/defects': typeof DefectsRoute
   '/plans': typeof PlansRoute
   '/processes': typeof ProcessesRoute
   '/requirements': typeof RequirementsRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/defects'
     | '/plans'
     | '/processes'
     | '/requirements'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/defects'
     | '/plans'
     | '/processes'
     | '/requirements'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/defects'
     | '/plans'
     | '/processes'
     | '/requirements'
@@ -125,6 +137,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DefectsRoute: typeof DefectsRoute
   PlansRoute: typeof PlansRoute
   ProcessesRoute: typeof ProcessesRoute
   RequirementsRoute: typeof RequirementsRoute
@@ -141,6 +154,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/defects': {
+      id: '/defects'
+      path: '/defects'
+      fullPath: '/defects'
+      preLoaderRoute: typeof DefectsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/plans': {
@@ -197,6 +217,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DefectsRoute: DefectsRoute,
   PlansRoute: PlansRoute,
   ProcessesRoute: ProcessesRoute,
   RequirementsRoute: RequirementsRoute,
