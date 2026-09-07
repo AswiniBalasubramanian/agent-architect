@@ -67,24 +67,24 @@ export function DefectPill({ status }: { status: DefectStatus }) {
 }
 
 const sevTone: Record<Severity, string> = {
-  "Sev 1": "bg-fail/12 text-fail",
-  "Sev 2": "bg-warn/12 text-warn",
-  "Sev 3": "bg-block/12 text-block",
-  "Sev 4": "bg-pending/20 text-muted-foreground",
+  Critical: "bg-fail/12 text-fail",
+  High: "bg-warn/12 text-warn",
+  Medium: "bg-block/12 text-block",
+  Low: "bg-pending/20 text-muted-foreground",
 };
 
 const sevLabel: Record<Severity, string> = {
-  "Sev 1": "Critical",
-  "Sev 2": "High",
-  "Sev 3": "Medium",
-  "Sev 4": "Low",
+  Critical: "Critical",
+  High: "High",
+  Medium: "Medium",
+  Low: "Low",
 };
 
 const sevDescription: Record<Severity, string> = {
-  "Sev 1": "Critical / Blocker: A major system outage or severe defect with no workaround. Core business functions are down.",
-  "Sev 2": "High / Major: A significant feature is broken or severely degraded, but some functions or workarounds may still exist.",
-  "Sev 3": "Medium / Moderate: A non-critical feature is malfunctioning or displaying incorrect data.",
-  "Sev 4": "Low / Minor: Cosmetic glitches, minor UI alignment issues, or small typos that do not impact functionality.",
+  Critical: "Critical / Blocker: A major system outage or severe defect with no workaround. Core business functions are down.",
+  High: "High / Major: A significant feature is broken or severely degraded, but some functions or workarounds may still exist.",
+  Medium: "Medium / Moderate: A non-critical feature is malfunctioning or displaying incorrect data.",
+  Low: "Low / Minor: Cosmetic glitches, minor UI alignment issues, or small typos that do not impact functionality.",
 };
 
 export function SeverityPill({ severity }: { severity: Severity }) {

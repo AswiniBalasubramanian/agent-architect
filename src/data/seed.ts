@@ -19,6 +19,7 @@ import type {
   TestRunStep,
   TestScenario,
   StepStatus,
+  Severity,
 } from "./types";
 
 const iso = (daysAgo: number, hour = 9) => {
@@ -63,7 +64,7 @@ const cfg = (group: string, values: string[], startAt = 1): ConfigValue[] =>
 export const configValues: ConfigValue[] = [
   ...cfg("Test Run Status", ["Not Started", "In Progress", "Passed", "Failed", "Blocked"]),
   ...cfg("Defect Status", ["New", "Triaged", "In Progress", "Resolved", "Closed", "Rejected"]),
-  ...cfg("Severity", ["Sev 1", "Sev 2", "Sev 3", "Sev 4"]),
+  ...cfg("Severity", ["Critical", "High", "Medium", "Low"]),
   ...cfg("Priority", ["Critical", "High", "Medium", "Low"]),
   ...cfg("Testing Type", ["Unit", "String", "Integration", "Regression", "UAT", "Performance"]),
   ...cfg("Environment", ["dev-sap-04", "qa-sap-02", "uat-sap-01", "perf-sap-1"]),
@@ -82,10 +83,10 @@ export const customFields: CustomField[] = [
 ];
 
 export const slaRules: SlaRule[] = [
-  { id: "sla1", name: "Sev 1 — Production Blocker", appliesTo: "Defect · Severity = Sev 1", condition: "Business hours 24×5", responseHours: 2, resolutionHours: 8, active: true },
-  { id: "sla2", name: "Sev 2 — Major", appliesTo: "Defect · Severity = Sev 2", condition: "Business hours 24×5", responseHours: 4, resolutionHours: 24, active: true },
-  { id: "sla3", name: "Sev 3 — Minor", appliesTo: "Defect · Severity = Sev 3", condition: "Business hours", responseHours: 8, resolutionHours: 72, active: true },
-  { id: "sla4", name: "Sev 4 — Cosmetic", appliesTo: "Defect · Severity = Sev 4", condition: "Best effort", responseHours: 24, resolutionHours: 168, active: true },
+  { id: "sla1", name: "Critical — Production Blocker", appliesTo: "Defect · Severity = Critical", condition: "Business hours 24×5", responseHours: 2, resolutionHours: 8, active: true },
+  { id: "sla2", name: "High — Major", appliesTo: "Defect · Severity = High", condition: "Business hours 24×5", responseHours: 4, resolutionHours: 24, active: true },
+  { id: "sla3", name: "Medium — Minor", appliesTo: "Defect · Severity = Medium", condition: "Business hours", responseHours: 8, resolutionHours: 72, active: true },
+  { id: "sla4", name: "Low — Cosmetic", appliesTo: "Defect · Severity = Low", condition: "Best effort", responseHours: 24, resolutionHours: 168, active: true },
 ];
 
 export const notificationRules: NotificationRule[] = [
@@ -474,23 +475,23 @@ export const testRuns: TestRun[] = (() => {
 
 const failedRuns = testRuns.filter((r) => r.status === "Failed" || r.status === "Blocked");
 
-const defectSeeds: [string, string, "Sev 1" | "Sev 2" | "Sev 3" | "Sev 4", Priority, string][] = [
-  ["Release strategy skips second approver above 50k", "Purchase orders over the threshold are released after a single approval, bypassing the second release code.", "Sev 1", "Critical", "New"],
-  ["Three-way match posts outside 2% tolerance", "Invoice auto-posts even when the price variance is 4.1%.", "Sev 1", "Critical", "In Progress"],
-  ["Batch field not captured on goods receipt", "Batch and expiry are not written for batch-managed materials.", "Sev 2", "High", "Triaged"],
-  ["Delivery split ignores second shipping point", "All items land on a single delivery regardless of shipping point.", "Sev 2", "High", "In Progress"],
-  ["Portal invoice publication delayed by 40 minutes", "Billing PDFs reach the customer portal well outside the 5 minute target.", "Sev 3", "Medium", "New"],
-  ["Closing cockpit task owners blank for company code 2000", "Task list renders without owner assignment for the second company code.", "Sev 2", "High", "Resolved"],
-  ["Allocation cycle rounds headcount incorrectly", "Assessment cycle rounds fractional headcount down, understating shared cost.", "Sev 3", "Medium", "Triaged"],
-  ["Vendor replication drops bank details", "Bank detail segment missing after replication from ServiceNow.", "Sev 2", "High", "Closed"],
-  ["Pricing override audit missing reason text", "Reason code is recorded but the free-text justification is dropped.", "Sev 3", "Low", "Rejected"],
-  ["Capacity evaluation times out over 10k orders", "Work centre evaluation exceeds 120 seconds on the performance environment.", "Sev 2", "High", "New"],
+const defectSeeds: [string, string, Severity, Priority, string][] = [
+  ["Release strategy skips second approver above 50k", "Purchase orders over the threshold are released after a single approval, bypassing the second release code.", "Critical", "Critical", "New"],
+  ["Three-way match posts outside 2% tolerance", "Invoice auto-posts even when the price variance is 4.1%.", "Critical", "Critical", "In Progress"],
+  ["Batch field not captured on goods receipt", "Batch and expiry are not written for batch-managed materials.", "High", "High", "Triaged"],
+  ["Delivery split ignores second shipping point", "All items land on a single delivery regardless of shipping point.", "High", "High", "In Progress"],
+  ["Portal invoice publication delayed by 40 minutes", "Billing PDFs reach the customer portal well outside the 5 minute target.", "Medium", "Medium", "New"],
+  ["Closing cockpit task owners blank for company code 2000", "Task list renders without owner assignment for the second company code.", "High", "High", "Resolved"],
+  ["Allocation cycle rounds headcount incorrectly", "Assessment cycle rounds fractional headcount down, understating shared cost.", "Medium", "Medium", "Triaged"],
+  ["Vendor replication drops bank details", "Bank detail segment missing after replication from ServiceNow.", "High", "High", "Closed"],
+  ["Pricing override audit missing reason text", "Reason code is recorded but the free-text justification is dropped.", "Medium", "Low", "Rejected"],
+  ["Capacity evaluation times out over 10k orders", "Work centre evaluation exceeds 120 seconds on the performance environment.", "High", "High", "New"],
 ];
 
 export const defects: Defect[] = defectSeeds.map(([title, description, severity, priority, status], i) => {
   const run = failedRuns[i % Math.max(failedRuns.length, 1)];
   const reportedOn = iso(i < 3 ? 3 : i < 6 ? 6 : 12, 7 + (i % 6));
-  const slaRuleId = severity === "Sev 1" ? "sla1" : severity === "Sev 2" ? "sla2" : severity === "Sev 3" ? "sla3" : "sla4";
+  const slaRuleId = severity === "Critical" ? "sla1" : severity === "High" ? "sla2" : severity === "Medium" ? "sla3" : "sla4";
   return {
     id: `df${i + 1}`,
     projectId: "p1",
