@@ -15,7 +15,7 @@ import {
   TextArea,
   TextInput,
 } from "@/components/ui-kit";
-import { useStore, userName, users, rollupStatus } from "@/store/app-store";
+import { useStore, userName, users, runCounts } from "@/store/app-store";
 import type { TestPlan } from "@/data/types";
 import { cn } from "@/lib/utils";
 
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/plans")({
 export function PlanRollup({ planId }: { planId: string }) {
   const store = useStore();
   const runs = store.runs.filter((r) => r.planId === planId);
-  const r = rollupStatus(runs);
+  const r = runCounts(runs);
   return (
     <div>
       <Meter
@@ -75,7 +75,7 @@ function PlansPage() {
 
   const active = store.plans.find((p) => p.id === selected);
   const runs = active ? store.runs.filter((r) => r.planId === active.id) : [];
-  const roll = rollupStatus(runs);
+  const roll = runCounts(runs);
 
   return (
     <AppShell breadcrumbs={["Test Plans", "Nortaxis Systems", "S/4HANA Rollout — Wave 2"]}>

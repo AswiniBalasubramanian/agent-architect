@@ -459,3 +459,15 @@ export { users, organizations, projects, currentUser };
 
 export const userById = (id?: string) => users.find((u) => u.id === id);
 export const userName = (id?: string) => userById(id)?.name ?? "Unassigned";
+
+export function runCounts(runs: { status: RunStatus }[]) {
+  const base: Record<RunStatus, number> = {
+    "Not Started": 0,
+    "In Progress": 0,
+    Passed: 0,
+    Failed: 0,
+    Blocked: 0,
+  };
+  for (const r of runs) base[r.status] = (base[r.status] ?? 0) + 1;
+  return base;
+}
