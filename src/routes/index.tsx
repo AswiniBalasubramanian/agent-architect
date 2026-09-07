@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { Caps, Legend, Meter, Panel, PageHeader, StatusPill, SeverityPill } from "@/components/ui-kit";
+import { Caps, Panel, PageHeader, StatusPill, SeverityPill } from "@/components/ui-kit";
 import { useStore, userName } from "@/store/app-store";
 import { formatDuration, slaState } from "@/lib/sla";
 import type { RunStatus } from "@/data/types";
@@ -73,29 +73,53 @@ function Dashboard() {
       />
 
       <div className="grid grid-cols-12 gap-3">
-        <Panel className="col-span-12 p-4 lg:col-span-7">
-          <div className="mb-3 flex items-center justify-between">
-            <Caps>Pass / fail rollup</Caps>
-            <span className="font-display text-[26px] leading-none font-semibold">{passRate}%</span>
+        <Panel className="col-span-12 overflow-hidden p-0 lg:col-span-7">
+          <div className="border-b border-border px-5 py-4">
+            <h2 className="text-[15px] font-semibold">Execution progress</h2>
+            <p className="mt-0.5 text-[12px] text-muted-foreground">Overall result for the current testing scope</p>
           </div>
-          <Meter
-            segments={[
-              { value: count("Passed"), className: "bg-pass" },
-              { value: count("In Progress"), className: "bg-run" },
-              { value: count("Failed"), className: "bg-fail" },
-              { value: count("Blocked"), className: "bg-block" },
-              { value: count("Not Started"), className: "bg-pending" },
-            ]}
-          />
-          <Legend
-            items={[
-              { label: "pass", value: count("Passed"), dot: "bg-pass" },
-              { label: "in run", value: count("In Progress"), dot: "bg-run" },
-              { label: "fail", value: count("Failed"), dot: "bg-fail" },
-              { label: "block", value: count("Blocked"), dot: "bg-block" },
-              { label: "pending", value: count("Not Started"), dot: "bg-pending" },
-            ]}
-          />
+          <div className="grid items-center gap-6 px-5 py-5 sm:grid-cols-[190px_1fr]">
+            <div className="relative mx-auto size-44" aria-label={`${passRate}% pass rate`}>
+              <svg className="size-full -rotate-90" viewBox="0 0 120 120" aria-hidden="true">
+                <circle cx="60" cy="60" r="46" fill="none" stroke="currentColor" strokeWidth="14" className="text-muted" />
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="46"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="14"
+                  pathLength="100"
+                  strokeDasharray={`${passRate} ${100 - passRate}`}
+                  className="text-pass"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                <span className="font-display text-[27px] leading-none font-semibold">{passRate}%</span>
+                <span className="mt-1 font-mono text-[10px] text-muted-foreground">{count("Passed")} of {executed} passed</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+              {[
+                { label: "Passed", value: count("Passed"), tone: "bg-pass" },
+                { label: "Failed", value: count("Failed"), tone: "bg-fail" },
+                { label: "In progress", value: count("In Progress"), tone: "bg-run" },
+                { label: "Blocked", value: count("Blocked"), tone: "bg-block" },
+              ].map((item) => (
+                <div key={item.label} className="border-b border-border pb-3">
+                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                    <span className={`size-2 rounded-full ${item.tone}`} />
+                    {item.label}
+                  </div>
+                  <div className="mt-1 font-display text-xl font-semibold">{item.value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex items-center justify-between border-t border-border px-5 py-3 text-[11px] text-muted-foreground">
+            <span>{runs.length} total runs</span>
+            <Link to="/runs" className="font-medium text-foreground hover:text-primary">View executions →</Link>
+          </div>
         </Panel>
 
         <Panel className="col-span-6 flex flex-col justify-between p-4 lg:col-span-2">
