@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ChevronDown, ChevronRight, Grid3X3, ListTree } from "lucide-react";
+import { ChevronDown, ChevronRight, Grid3X3, ListTree, SlidersHorizontal, Columns3, X } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button, Caps, Field, Modal, PageHeader, Panel, Select, TextInput } from "@/components/ui-kit";
 import { useStore, userName, users } from "@/store/app-store";
@@ -29,6 +29,16 @@ function ProcessesPage() {
   const [selected, setSelected] = useState<string | null>(null);
   const [creating, setCreating] = useState<{ parentId: string | null } | null>(null);
   const [form, setForm] = useState({ name: "", levelType: "Process Step", application: "SAP ERP", owner: "u2" });
+  const [filters, setFilters] = useState({ levelType: "", application: "", owner: "", source: "" });
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [columnsOpen, setColumnsOpen] = useState(false);
+  const [columns, setColumns] = useState({ levelType: true, application: true, owner: true, coverage: true, source: true });
+  const activeFilterCount = Object.values(filters).filter(Boolean).length;
+  const matchesFilters = (node: BusinessProcess) =>
+    (!filters.levelType || node.levelType === filters.levelType) &&
+    (!filters.application || node.application === filters.application) &&
+    (!filters.owner || node.owner === filters.owner) &&
+    (!filters.source || node.sourceType === filters.source);
 
   const childrenOf = useMemo(() => {
     const map = new Map<string | null, BusinessProcess[]>();
@@ -70,6 +80,23 @@ function ProcessesPage() {
     return out;
   }, [childrenOf, collapsed, view]);
 
+  const visibleRows = useMemo(
+    () => (activeFilterCount ? rows.filter((r) => matchesFilters(r.node)) : rows),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [rows, filters],
+  );
+
+  const columnDefs = [
+    { id: "levelType", label: "Level type" },
+    { id: "application", label: "Application" },
+    { id: "owner", label: "Owner" },
+    { id: "coverage", label: "Coverage" },
+    { id: "source", label: "Source" },
+  ] as const;
+  type ColumnId = (typeof columnDefs)[number]["id"];
+  const visibleCols = columnDefs.filter((c) => columns[c.id]);
+  const gridTemplate = `80px minmax(0,2fr) ${visibleCols.map((c) => (c.id === "coverage" ? "120px" : c.id === "source" ? "80px" : "minmax(0,1fr)")).join(" ")}`;
+
   const levelTypes = store.config.filter((c) => c.group === "Level Type" && c.active);
   const applications = store.config.filter((c) => c.group === "Application" && c.active);
 
@@ -109,6 +136,99 @@ function ProcessesPage() {
                 </button>
               ))}
             </div>
+            <div className="relative">
+              <Button variant="ghost" onClick={() => { setFilterOpen((o) => !o); setColumnsOpen(false); }} className="gap-1.5">
+                <SlidersHorizontal className="size-3.5" />
+                Filter
+                {activeFilterCount > 0 && (
+                  <span className="grid size-4 place-items-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
+                    {activeFilterCount}
+                  </span>
+                )}
+              </Button>
+              {filterOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setFilterOpen(false)} />
+                  <div className="absolute right-0 z-50 mt-2 w-64 space-y-3 rounded-lg border border-border bg-popover p-4 shadow-xl">
+                    <div className="flex items-center justify-between">
+                      <Caps>Filter processes</Caps>
+                      <button type="button" onClick={() => setFilterOpen(false)} className="text-muted-foreground hover:text-foreground" aria-label="Close filters">
+                        <X className="size-4" />
+                      </button>
+                    </div>
+                    <Field label="Level type">
+                      <Select value={filters.levelType} onChange={(e) => setFilters({ ...filters, levelType: e.target.value })}>
+                        <option value="">All</option>
+                        {levelTypes.map((l) => (
+                          <option key={l.id}>{l.value}</option>
+                        ))}
+                      </Select>
+                    </Field>
+                    <Field label="Application">
+                      <Select value={filters.application} onChange={(e) => setFilters({ ...filters, application: e.target.value })}>
+                        <option value="">All</option>
+                        {applications.map((l) => (
+                          <option key={l.id}>{l.value}</option>
+                        ))}
+                      </Select>
+                    </Field>
+                    <Field label="Owner">
+                      <Select value={filters.owner} onChange={(e) => setFilters({ ...filters, owner: e.target.value })}>
+                        <option value="">All</option>
+                        {users.map((u) => (
+                          <option key={u.id} value={u.id}>{u.name}</option>
+                        ))}
+                      </Select>
+                    </Field>
+                    <Field label="Source">
+                      <Select value={filters.source} onChange={(e) => setFilters({ ...filters, source: e.target.value })}>
+                        <option value="">All</option>
+                        <option>Manual</option>
+                        <option>Integration</option>
+                        <option>Agent</option>
+                      </Select>
+                    </Field>
+                    {activeFilterCount > 0 && (
+                      <Button variant="ghost" className="w-full" onClick={() => setFilters({ levelType: "", application: "", owner: "", source: "" })}>
+                        Clear all filters
+                      </Button>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="relative">
+              <Button variant="ghost" onClick={() => { setColumnsOpen((o) => !o); setFilterOpen(false); }} className="gap-1.5">
+                <Columns3 className="size-3.5" />
+                Columns
+              </Button>
+              {columnsOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setColumnsOpen(false)} />
+                  <div className="absolute right-0 z-50 mt-2 w-52 rounded-lg border border-border bg-popover p-4 shadow-xl">
+                    <div className="flex items-center justify-between">
+                      <Caps>Toggle columns</Caps>
+                      <button type="button" onClick={() => setColumnsOpen(false)} className="text-muted-foreground hover:text-foreground" aria-label="Close columns">
+                        <X className="size-4" />
+                      </button>
+                    </div>
+                    <div className="mt-3 space-y-2">
+                      {columnDefs.map((col) => (
+                        <label key={col.id} className="flex cursor-pointer items-center gap-2.5 text-[13px] text-foreground">
+                          <input
+                            type="checkbox"
+                            checked={columns[col.id]}
+                            onChange={() => setColumns({ ...columns, [col.id]: !columns[col.id] })}
+                            className="size-4 accent-[var(--primary)]"
+                          />
+                          {col.label}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
             <Button onClick={() => setCreating({ parentId: selected })}>
               {selected ? "Add child node" : "Add root node"}
             </Button>
@@ -118,7 +238,7 @@ function ProcessesPage() {
 
       {view === "grid" ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {rows.map(({ node, depth, wbs }) => {
+          {visibleRows.map(({ node, depth, wbs }) => {
             const kids = childrenOf.get(node.id) ?? [];
             const cov = coverage(node.id);
             const parent = node.parentId ? store.processes.find((process) => process.id === node.parentId) : null;
@@ -142,22 +262,30 @@ function ProcessesPage() {
                   </span>
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-[11px]">
-                  <div>
-                    <Caps>Level type</Caps>
-                    <div className="mt-1 truncate text-foreground">{node.levelType}</div>
-                  </div>
-                  <div>
-                    <Caps>Application</Caps>
-                    <div className="mt-1 truncate font-mono text-[10px] text-foreground">{node.application}</div>
-                  </div>
-                  <div>
-                    <Caps>Owner</Caps>
-                    <div className="mt-1 truncate text-foreground">{userName(node.owner)}</div>
-                  </div>
-                  <div>
-                    <Caps>Coverage</Caps>
-                    <div className="mt-1 font-mono text-[10px] text-foreground">{cov.cases} cases · {cov.passed} pass</div>
-                  </div>
+                  {columns.levelType && (
+                    <div>
+                      <Caps>Level type</Caps>
+                      <div className="mt-1 truncate text-foreground">{node.levelType}</div>
+                    </div>
+                  )}
+                  {columns.application && (
+                    <div>
+                      <Caps>Application</Caps>
+                      <div className="mt-1 truncate font-mono text-[10px] text-foreground">{node.application}</div>
+                    </div>
+                  )}
+                  {columns.owner && (
+                    <div>
+                      <Caps>Owner</Caps>
+                      <div className="mt-1 truncate text-foreground">{userName(node.owner)}</div>
+                    </div>
+                  )}
+                  {columns.coverage && (
+                    <div>
+                      <Caps>Coverage</Caps>
+                      <div className="mt-1 font-mono text-[10px] text-foreground">{cov.cases} cases · {cov.passed} pass</div>
+                    </div>
+                  )}
                 </div>
                 <div className="mt-4 flex items-center justify-between border-t border-border pt-3 font-mono text-[9px] text-muted-foreground">
                   <span className="truncate pr-3">{parent ? `Under ${parent.name}` : "Root process"}</span>
@@ -169,15 +297,18 @@ function ProcessesPage() {
         </div>
       ) : (
         <Panel className="overflow-x-auto p-0">
-          <div className="grid min-w-[900px] grid-cols-[80px_minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_120px_80px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground">
-            <span>WBS</span><span>NAME</span><span>LEVEL TYPE</span><span>APPLICATION</span><span>OWNER</span><span>COVERAGE</span><span className="text-right">SOURCE</span>
+          <div className="grid min-w-[900px] gap-2 border-b border-border px-4 py-2 font-mono text-[9px] tracking-[0.12em] text-muted-foreground" style={{ gridTemplateColumns: gridTemplate }}>
+            <span>WBS</span><span>NAME</span>
+            {visibleCols.map((col) => (
+              <span key={col.id} className={col.id === "source" ? "text-right" : ""}>{col.label.toUpperCase()}</span>
+            ))}
           </div>
           <div className="min-w-[900px] divide-y divide-border text-[12px]">
-            {rows.map(({ node, depth, wbs }) => {
+            {visibleRows.map(({ node, depth, wbs }) => {
               const kids = childrenOf.get(node.id) ?? [];
               const cov = coverage(node.id);
               return (
-                <div key={node.id} onClick={() => setSelected(node.id === selected ? null : node.id)} className={cn("grid cursor-pointer grid-cols-[80px_minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_120px_80px] items-center gap-2 px-4 py-2 hover:bg-muted/70", selected === node.id && "bg-muted")}>
+                <div key={node.id} onClick={() => setSelected(node.id === selected ? null : node.id)} style={{ gridTemplateColumns: gridTemplate }} className={cn("grid cursor-pointer items-center gap-2 px-4 py-2 hover:bg-muted/70", selected === node.id && "bg-muted")}>
                   <span className="font-mono text-[10px] text-muted-foreground">{wbs}</span>
                   <div className="flex min-w-0 items-center gap-1.5" style={{ paddingLeft: depth * 16 }}>
                     {kids.length ? (
@@ -189,11 +320,11 @@ function ProcessesPage() {
                     ) : <span className="w-6" />}
                     <span className="truncate font-medium">{node.name}</span>
                   </div>
-                  <span className="truncate text-muted-foreground">{node.levelType}</span>
-                  <span className="truncate font-mono text-[10px] text-muted-foreground">{node.application}</span>
-                  <span className="truncate text-muted-foreground">{userName(node.owner)}</span>
-                  <span className="font-mono text-[10px] text-muted-foreground">{cov.cases} cases · {cov.passed} pass</span>
-                  <span className="text-right font-mono text-[10px] text-muted-foreground">{node.sourceType}</span>
+                  {columns.levelType && <span className="truncate text-muted-foreground">{node.levelType}</span>}
+                  {columns.application && <span className="truncate font-mono text-[10px] text-muted-foreground">{node.application}</span>}
+                  {columns.owner && <span className="truncate text-muted-foreground">{userName(node.owner)}</span>}
+                  {columns.coverage && <span className="font-mono text-[10px] text-muted-foreground">{cov.cases} cases · {cov.passed} pass</span>}
+                  {columns.source && <span className="text-right font-mono text-[10px] text-muted-foreground">{node.sourceType}</span>}
                 </div>
               );
             })}
