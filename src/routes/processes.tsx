@@ -308,7 +308,7 @@ function ProcessesPage() {
               const kids = childrenOf.get(node.id) ?? [];
               const cov = coverage(node.id);
               return (
-                <div key={node.id} onClick={() => setSelected(node.id === selected ? null : node.id)} className={cn("grid cursor-pointer grid-cols-[80px_minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_120px_80px] items-center gap-2 px-4 py-2 hover:bg-muted/70", selected === node.id && "bg-muted")}>
+                <div key={node.id} onClick={() => setSelected(node.id === selected ? null : node.id)} style={{ gridTemplateColumns: gridTemplate }} className={cn("grid cursor-pointer items-center gap-2 px-4 py-2 hover:bg-muted/70", selected === node.id && "bg-muted")}>
                   <span className="font-mono text-[10px] text-muted-foreground">{wbs}</span>
                   <div className="flex min-w-0 items-center gap-1.5" style={{ paddingLeft: depth * 16 }}>
                     {kids.length ? (
