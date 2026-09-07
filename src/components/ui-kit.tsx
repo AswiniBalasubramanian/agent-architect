@@ -112,16 +112,36 @@ export function PriorityTag({ priority }: { priority: Priority }) {
 export function Meter({
   segments,
   className,
+  blocks,
 }: {
   segments: { value: number; className: string; label?: string }[];
   className?: string;
+  /** Number of discrete blocks; defaults to total units (when integer & small) else 24 */
+  blocks?: number;
 }) {
   const total = segments.reduce((a, s) => a + s.value, 0) || 1;
+  const n =
+    blocks ?? (Number.isInteger(total) && total >= 1 && total <= 40 ? Math.max(1, total) : 24);
+  // cumulative upper bounds (as fractions of total) per segment
+  const bounds: { upto: number; className: string; label?: string }[] = [];
+  let acc = 0;
+  for (const s of segments) {
+    acc += s.value / total;
+    bounds.push({ upto: acc, className: s.className, ...(s.label !== undefined ? { label: s.label } : {}) });
+  }
   return (
-    <div className={cn("flex h-3 w-full overflow-hidden rounded-full bg-line/50", className)}>
-      {segments.map((s, i) => (
-        <div key={i} className={s.className} style={{ width: `${(s.value / total) * 100}%` }} title={s.label} />
-      ))}
+    <div className={cn("flex w-full gap-[3px]", className)}>
+      {Array.from({ length: n }, (_, i) => {
+        const frac = (i + 0.5) / n;
+        const seg = bounds.find((b) => frac <= b.upto) ?? bounds[bounds.length - 1]!;
+        return (
+          <div
+            key={i}
+            className={cn("h-2.5 min-w-1 flex-1 rounded-full transition-colors", seg.className)}
+            title={seg.label}
+          />
+        );
+      })}
     </div>
   );
 }
