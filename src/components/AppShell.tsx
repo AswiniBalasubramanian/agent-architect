@@ -40,30 +40,34 @@ import { cn } from "@/lib/utils";
 
 type NavItem = { to: string; label: string; icon: LucideIcon };
 
-const navGroups: { heading: string; items: NavItem[] }[] = [
+const navGroups: { heading: string; scope: string; items: NavItem[] }[] = [
   {
     heading: "Overview",
+    scope: "",
+    items: [{ to: "/", label: "Dashboard", icon: LayoutDashboard }],
+  },
+  {
+    heading: "Organization library",
+    scope: "Shared across projects",
     items: [
-      { to: "/", label: "Dashboard", icon: LayoutDashboard },
       { to: "/processes", label: "Business Processes", icon: Network },
       { to: "/requirements", label: "Requirements", icon: FileCheck2 },
-    ],
-  },
-  {
-    heading: "Execution",
-    items: [
       { to: "/test-cases", label: "Test Cases", icon: CheckSquare2 },
       { to: "/scenarios", label: "Scenarios", icon: FolderKanban },
-      { to: "/plans", label: "Test Plans", icon: ClipboardCheck },
-      { to: "/runs", label: "Test Runs", icon: TestTube2 },
     ],
   },
   {
-    heading: "Quality",
-    items: [{ to: "/defects", label: "Defects", icon: Bug }],
+    heading: "Project execution",
+    scope: "Scoped to this project",
+    items: [
+      { to: "/plans", label: "Test Plans", icon: ClipboardCheck },
+      { to: "/runs", label: "Test Runs", icon: TestTube2 },
+      { to: "/defects", label: "Defects", icon: Bug },
+    ],
   },
   {
     heading: "Reporting",
+    scope: "Project rollups",
     items: [
       { to: "/insights", label: "Insights", icon: Lightbulb },
       { to: "/reports", label: "Reports", icon: LineChart },
@@ -71,9 +75,11 @@ const navGroups: { heading: string; items: NavItem[] }[] = [
   },
   {
     heading: "Administration",
+    scope: "Organization settings",
     items: [{ to: "/admin", label: "Administration", icon: Settings2 }],
   },
 ];
+
 
 export function AppShell({
   breadcrumbs,
