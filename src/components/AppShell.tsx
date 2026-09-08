@@ -193,8 +193,14 @@ export function AppShell({
         {visibleGroups.map((group, groupIndex) => (
           <div key={group.heading} className={cn(groupIndex > 0 && (collapsed && !mobile ? "mt-3 border-t border-border pt-3" : "mt-4"))}>
             {collapsed && !mobile ? null : (
-              <div className="px-3 pb-1.5 text-[11px] font-medium text-muted-foreground">{group.heading}</div>
+              <div className="px-3 pb-1.5">
+                <div className="text-[11px] font-medium text-muted-foreground">{group.heading}</div>
+                {group.scope ? (
+                  <div className="text-[10px] text-muted-foreground/70">{group.scope}</div>
+                ) : null}
+              </div>
             )}
+
             <div className="space-y-0.5">
               {group.items.map((item) => {
                 const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
