@@ -40,30 +40,34 @@ import { cn } from "@/lib/utils";
 
 type NavItem = { to: string; label: string; icon: LucideIcon };
 
-const navGroups: { heading: string; items: NavItem[] }[] = [
+const navGroups: { heading: string; scope: string; items: NavItem[] }[] = [
   {
     heading: "Overview",
+    scope: "",
+    items: [{ to: "/", label: "Dashboard", icon: LayoutDashboard }],
+  },
+  {
+    heading: "Organization library",
+    scope: "Shared across projects",
     items: [
-      { to: "/", label: "Dashboard", icon: LayoutDashboard },
       { to: "/processes", label: "Business Processes", icon: Network },
       { to: "/requirements", label: "Requirements", icon: FileCheck2 },
-    ],
-  },
-  {
-    heading: "Execution",
-    items: [
       { to: "/test-cases", label: "Test Cases", icon: CheckSquare2 },
       { to: "/scenarios", label: "Scenarios", icon: FolderKanban },
-      { to: "/plans", label: "Test Plans", icon: ClipboardCheck },
-      { to: "/runs", label: "Test Runs", icon: TestTube2 },
     ],
   },
   {
-    heading: "Quality",
-    items: [{ to: "/defects", label: "Defects", icon: Bug }],
+    heading: "Project execution",
+    scope: "Scoped to this project",
+    items: [
+      { to: "/plans", label: "Test Plans", icon: ClipboardCheck },
+      { to: "/runs", label: "Test Runs", icon: TestTube2 },
+      { to: "/defects", label: "Defects", icon: Bug },
+    ],
   },
   {
     heading: "Reporting",
+    scope: "Project rollups",
     items: [
       { to: "/insights", label: "Insights", icon: Lightbulb },
       { to: "/reports", label: "Reports", icon: LineChart },
@@ -71,9 +75,11 @@ const navGroups: { heading: string; items: NavItem[] }[] = [
   },
   {
     heading: "Administration",
+    scope: "Organization settings",
     items: [{ to: "/admin", label: "Administration", icon: Settings2 }],
   },
 ];
+
 
 export function AppShell({
   breadcrumbs,
@@ -187,8 +193,14 @@ export function AppShell({
         {visibleGroups.map((group, groupIndex) => (
           <div key={group.heading} className={cn(groupIndex > 0 && (collapsed && !mobile ? "mt-3 border-t border-border pt-3" : "mt-4"))}>
             {collapsed && !mobile ? null : (
-              <div className="px-3 pb-1.5 text-[11px] font-medium text-muted-foreground">{group.heading}</div>
+              <div className="px-3 pb-1.5">
+                <div className="text-[11px] font-medium text-muted-foreground">{group.heading}</div>
+                {group.scope ? (
+                  <div className="text-[10px] text-muted-foreground/70">{group.scope}</div>
+                ) : null}
+              </div>
             )}
+
             <div className="space-y-0.5">
               {group.items.map((item) => {
                 const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
