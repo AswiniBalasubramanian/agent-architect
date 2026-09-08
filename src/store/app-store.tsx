@@ -123,7 +123,15 @@ interface Actions {
   syncIntegration: (id: ID) => Promise<void>;
 }
 
-const AppStoreContext = createContext<(State & Derived & Actions) | null>(null);
+type AppStoreValue = State & Derived & Actions;
+
+// Kept on globalThis so hot-reloads / duplicate module instances share one context.
+const globalScope = globalThis as unknown as {
+  __appStoreContext?: React.Context<AppStoreValue | null>;
+};
+const AppStoreContext =
+  globalScope.__appStoreContext ??
+  (globalScope.__appStoreContext = createContext<AppStoreValue | null>(null));
 
 const rollupStatus = (steps: { status: StepStatus }[]): RunStatus => {
   if (steps.some((s) => s.status === "Failed")) return "Failed";
